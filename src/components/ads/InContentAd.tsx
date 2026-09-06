@@ -14,7 +14,7 @@ interface InContentAdProps {
 /**
  * In-Content Ad placement for article body.
  * Mobile-first in-content placement.
- * Uses one 320x50 banner on mobile and a larger leaderboard on desktop.
+ * Renders two stacked Adsterra banners per ad card for stronger fill inside articles.
  */
 export default function InContentAd({ slotId, format, className = "", index = 0 }: InContentAdProps) {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
@@ -51,6 +51,16 @@ export default function InContentAd({ slotId, format, className = "", index = 0 
         </span>
         <div
           className="flex max-w-full items-center justify-center overflow-hidden"
+          style={{ width: adConfig.width, height: adConfig.height }}
+        >
+          <AdsterraAd
+            adKey={adConfig.key}
+            width={adConfig.width}
+            height={adConfig.height}
+          />
+        </div>
+        <div
+          className="mt-1.5 flex max-w-full items-center justify-center overflow-hidden"
           style={{ width: adConfig.width, height: adConfig.height }}
         >
           <AdsterraAd
