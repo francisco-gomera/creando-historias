@@ -3,7 +3,7 @@ export const ADSTERRA_ADS_ENABLED =
   process.env.NODE_ENV === "production";
 
 export const ADSTERRA_INTRUSIVE_FORMATS_ENABLED =
-  ADSTERRA_ADS_ENABLED && process.env.NEXT_PUBLIC_ADSENSE_REVIEW_MODE !== "true";
+  ADSTERRA_ADS_ENABLED && process.env.NEXT_PUBLIC_ADSTERRA_INTRUSIVE_FORMATS !== "false";
 
 export const ADSTERRA_ROUTES_WITHOUT_ADS = [
   "/about",

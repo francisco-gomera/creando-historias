@@ -9,7 +9,7 @@ interface AnalyticsTrackerProps {
 
 export default function AnalyticsTracker({ articleId, authorId }: AnalyticsTrackerProps) {
   useEffect(() => {
-    // Don't track analytics when loaded inside an iframe (e.g. Google AdSense previewer)
+    // Don't track analytics when loaded inside an iframe or external preview tool.
     if (typeof window !== "undefined" && window.self !== window.top) {
       return;
     }

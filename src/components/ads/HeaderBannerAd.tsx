@@ -27,9 +27,9 @@ export default function HeaderBannerAd({ slotId, className = "" }: HeaderBannerA
   }, []);
 
   return (
-    <div className={`w-full max-w-5xl mx-auto px-2 sm:px-4 py-2 ${className}`}>
-      <div className="w-full bg-white/70 dark:bg-gray-900/50 border border-gray-200/50 dark:border-gray-800/50 rounded-2xl py-2 px-3 flex flex-col items-center justify-center text-center overflow-hidden shadow-xs">
-        <span className="text-[9px] font-semibold uppercase tracking-widest text-gray-400/70 dark:text-gray-600/70 mb-1 select-none">
+    <div className={`w-full max-w-5xl mx-auto px-2 sm:px-4 pt-2 pb-1 sm:py-3 ${className}`}>
+      <div className="w-full bg-white dark:bg-gray-900/70 border border-gray-200/70 dark:border-gray-800/70 rounded-xl sm:rounded-2xl py-1.5 px-2 sm:px-3 flex flex-col items-center justify-center text-center overflow-hidden shadow-sm">
+        <span className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-widest text-gray-400/80 dark:text-gray-600/80 mb-1 select-none">
           Publicidad
         </span>
 

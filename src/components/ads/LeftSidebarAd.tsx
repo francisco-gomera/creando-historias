@@ -13,8 +13,8 @@ export default function LeftSidebarAd({ className = "", mobile = false }: LeftSi
 
   return (
     <div className={`w-full ${!mobile ? "lg:sticky lg:top-20" : ""} ${className}`}>
-      <div className="w-full bg-white/70 dark:bg-gray-900/50 border border-gray-200/50 dark:border-gray-800/50 rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-start text-center overflow-hidden shadow-xs">
-        <span className="text-[9px] font-semibold uppercase tracking-widest text-gray-400/70 dark:text-gray-600/70 mb-2.5 select-none">
+      <div className="w-full bg-white dark:bg-gray-900/70 border border-gray-200/70 dark:border-gray-800/70 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-start text-center overflow-hidden shadow-sm">
+        <span className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-widest text-gray-400/80 dark:text-gray-600/80 mb-2.5 select-none">
           Publicidad
         </span>
 
@@ -22,7 +22,7 @@ export default function LeftSidebarAd({ className = "", mobile = false }: LeftSi
           {Array.from({ length: adCount }).map((_, index) => (
             <div
               key={`left-sidebar-ad-${index}`}
-              className="w-full max-w-[320px] rounded-xl border border-gray-100/80 dark:border-gray-800/80 bg-gray-50/70 dark:bg-gray-950/30 p-2 overflow-hidden"
+              className="w-full max-w-[320px] rounded-lg border border-gray-100/80 dark:border-gray-800/80 bg-gray-50/70 dark:bg-gray-950/30 p-1.5 overflow-hidden"
             >
               <div className="flex h-[50px] w-full items-center justify-center overflow-hidden">
                 <AdsterraAd

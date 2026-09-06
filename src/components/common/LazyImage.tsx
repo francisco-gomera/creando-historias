@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
  * 
  * Problem: Base64 images (data:image/...) stored in the DB can be 1MB+.
  * When rendered in SSR HTML, they inflate the page to 2+ MB, causing
- * Google AdSense's previewer to fail with "loading issues".
+ * ad and social preview tools to fail with loading issues.
  * 
  * Solution: For base64 images, render a lightweight placeholder during SSR,
  * then swap in the actual image on the client after hydration.

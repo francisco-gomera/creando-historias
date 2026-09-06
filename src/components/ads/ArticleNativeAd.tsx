@@ -25,12 +25,11 @@ export default function ArticleNativeAd({ placement }: ArticleNativeAdProps) {
 
   if (isMobile === null) return null;
 
-  // Mobile position: under title and subtitle
   if (isMobile && placement === "header") {
     return (
-      <div className="w-full my-5">
-        <div className="w-full bg-white/80 dark:bg-gray-900/60 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-3 sm:p-4 shadow-xs">
-          <span className="text-[9px] font-semibold uppercase tracking-widest text-gray-400/70 dark:text-gray-600/70 mb-2 block text-center select-none">
+      <div className="w-full my-4">
+        <div className="w-full bg-white dark:bg-gray-900/70 border border-gray-200/70 dark:border-gray-800/70 rounded-xl p-2.5 shadow-sm">
+          <span className="text-[8px] font-semibold uppercase tracking-widest text-gray-400/80 dark:text-gray-600/80 mb-2 block text-center select-none">
             Publicidad recomendada
           </span>
           <AdsterraNativeBanner />
@@ -39,7 +38,6 @@ export default function ArticleNativeAd({ placement }: ArticleNativeAdProps) {
     );
   }
 
-  // Desktop position: sticky right sidebar
   if (!isMobile && placement === "sidebar") {
     return (
       <div className="w-full sticky top-20">

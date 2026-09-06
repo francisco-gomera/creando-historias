@@ -30,7 +30,7 @@ export default function StickyFloatingAd({ slotId, className = "" }: StickyFloat
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 shadow-2xl py-1 px-2 flex justify-center items-center ${className}`}
+      className={`fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 shadow-2xl px-2 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-1 flex justify-center items-center ${className}`}
       style={{ touchAction: "pan-y" }}
     >
       <button

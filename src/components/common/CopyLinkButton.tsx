@@ -71,7 +71,7 @@ export default function CopyLinkButton({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      // Silently handle errors (e.g. inside AdSense preview iframe)
+      // Silently handle copy failures in restricted browser contexts.
     }
   };
 

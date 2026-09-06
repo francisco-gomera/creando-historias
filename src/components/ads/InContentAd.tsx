@@ -13,8 +13,8 @@ interface InContentAdProps {
 
 /**
  * In-Content Ad placement for article body.
- * Renders TWO stacked Adsterra banner ads per slot for better mobile fill.
- * Mobile-first: uses 320x50 banners on mobile, 468x60 on desktop.
+ * Mobile-first in-content placement.
+ * Uses one 320x50 banner on mobile and a larger leaderboard on desktop.
  */
 export default function InContentAd({ slotId, format, className = "", index = 0 }: InContentAdProps) {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
@@ -41,28 +41,16 @@ export default function InContentAd({ slotId, format, className = "", index = 0 
       };
 
   return (
-    <div className={`w-full my-6 sm:my-8 flex justify-center ${className}`}>
+    <div className={`w-full my-5 sm:my-8 flex justify-center ${className}`}>
       <div
-        className="inline-flex max-w-full flex-col items-center justify-center overflow-hidden rounded-xl border border-gray-200/60 bg-gray-50/70 p-2 text-center dark:border-gray-800/60 dark:bg-gray-900/40"
+        className="inline-flex max-w-full flex-col items-center justify-center overflow-hidden rounded-xl border border-gray-200/70 bg-white p-1.5 text-center shadow-sm dark:border-gray-800/70 dark:bg-gray-900/70 sm:p-2"
         style={{ width: adConfig.width + 16 }}
       >
-        <span className="text-[9px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-600 mb-1.5 select-none">
+        <span className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-600 mb-1 select-none">
           Publicidad
         </span>
-        {/* First ad */}
         <div
           className="flex max-w-full items-center justify-center overflow-hidden"
-          style={{ width: adConfig.width, height: adConfig.height }}
-        >
-          <AdsterraAd
-            adKey={adConfig.key}
-            width={adConfig.width}
-            height={adConfig.height}
-          />
-        </div>
-        {/* Second ad stacked below */}
-        <div
-          className="flex max-w-full items-center justify-center overflow-hidden mt-1.5"
           style={{ width: adConfig.width, height: adConfig.height }}
         >
           <AdsterraAd

@@ -125,7 +125,7 @@ export default async function StoryPage({ params }: Props) {
   };
 
   return (
-    <div className="relative bg-gray-50 dark:bg-[#090d16] min-h-screen">
+    <div className="relative bg-gray-50 dark:bg-[#090d16] min-h-screen pb-20 lg:pb-0">
       <AnalyticsTracker articleId={article.id} authorId={article.author.id} />
 
       <script
@@ -152,7 +152,7 @@ export default async function StoryPage({ params }: Props) {
         </div>
 
         {/* Article + Sidebar Layout */}
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-5 lg:gap-8">
         {/* Left Sidebar with independent display ads (desktop) */}
         <aside className="hidden lg:block w-[300px] flex-shrink-0 space-y-6">
           <LeftSidebarAd />
@@ -163,11 +163,11 @@ export default async function StoryPage({ params }: Props) {
           <article
             itemScope
             itemType="https://schema.org/BlogPosting"
-            className="bg-white dark:bg-gray-900 rounded-none sm:rounded-3xl border-x-0 sm:border border-gray-200/80 dark:border-gray-800/80 shadow-xs overflow-hidden"
+            className="bg-white dark:bg-gray-900 rounded-none sm:rounded-2xl border-y sm:border border-gray-200/80 dark:border-gray-800/80 shadow-sm overflow-hidden"
           >
             {/* Featured Image Header */}
             {validFeaturedImage && (
-              <div className="w-full h-64 sm:h-96 bg-gray-100 dark:bg-gray-800 relative">
+              <div className="w-full h-56 sm:h-96 bg-gray-100 dark:bg-gray-800 relative">
                 <img
                   itemProp="image"
                   src={getOptimizedImageUrl(validFeaturedImage, 1200, 75)}
@@ -182,8 +182,8 @@ export default async function StoryPage({ params }: Props) {
               </div>
             )}
 
-            <div className="p-4 sm:p-10 space-y-6">
-              <div className="article-header space-y-4 max-w-[750px] mx-auto">
+            <div className="px-4 py-5 sm:p-10 space-y-6">
+              <div className="article-header space-y-3 sm:space-y-4 max-w-[750px] mx-auto">
                 {article.category && (
                   <Link
                     href={`/category/${article.category.slug}`}
@@ -193,12 +193,12 @@ export default async function StoryPage({ params }: Props) {
                   </Link>
                 )}
 
-                <h1 itemProp="headline" className="font-serif text-3xl sm:text-4xl lg:text-[40px] font-black text-gray-900 dark:text-white leading-[1.25] tracking-tight">
+                <h1 itemProp="headline" className="font-serif text-[30px] sm:text-4xl lg:text-[40px] font-black text-gray-900 dark:text-white leading-[1.14] sm:leading-[1.25] tracking-tight">
                   {article.title}
                 </h1>
 
                 {article.excerpt && (
-                  <p itemProp="description" className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 font-sans leading-relaxed">
+                  <p itemProp="description" className="text-base sm:text-xl text-gray-600 dark:text-gray-300 font-sans leading-relaxed">
                     {article.excerpt}
                   </p>
                 )}
@@ -207,7 +207,7 @@ export default async function StoryPage({ params }: Props) {
                 <ArticleNativeAd placement="header" />
 
                 {/* Author & Meta Row */}
-                <div className="flex items-center justify-between py-4 border-y border-gray-100 dark:border-gray-800/80 text-sm text-gray-600 dark:text-gray-400 flex-wrap gap-4">
+                <div className="flex items-center justify-between py-3 sm:py-4 border-y border-gray-100 dark:border-gray-800/80 text-sm text-gray-600 dark:text-gray-400 flex-wrap gap-3 sm:gap-4">
                   <Link href={`/author/${article.author.username}`} className="flex items-center space-x-3 group">
                     <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-500 to-brand-800 text-white flex items-center justify-center font-bold font-serif text-lg overflow-hidden shadow-glow group-hover:scale-105 transition-transform duration-300">
                       {article.author.avatarUrl ? (
@@ -264,7 +264,7 @@ export default async function StoryPage({ params }: Props) {
           </article>
 
           {/* Author Card - Full Width Central Column */}
-          <div className="w-full bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800/80 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+          <div className="w-full bg-white dark:bg-gray-900 border-y sm:border border-gray-200/80 dark:border-gray-800/80 rounded-none sm:rounded-2xl p-4 sm:p-8 space-y-4 shadow-sm">
             <div className="flex items-center space-x-2 text-xs font-bold text-brand-500 uppercase tracking-wider border-b border-gray-100 dark:border-gray-800 pb-3">
               <User className="w-4 h-4" />
               <span>Sobre el autor</span>
@@ -304,17 +304,17 @@ export default async function StoryPage({ params }: Props) {
 
           {/* Recommendations Grid */}
           {relatedArticles.length > 0 && (
-            <section className="space-y-6">
-              <div className="flex items-center justify-between">
+            <section className="space-y-5 px-4 sm:px-0">
+              <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center space-x-2.5">
                   <div className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-500 flex items-center justify-center font-bold">
                     <BookOpen className="w-4 h-4" />
                   </div>
-                  <h3 className="font-display text-2xl font-black text-gray-900 dark:text-white">
+                  <h3 className="font-display text-xl sm:text-2xl font-black text-gray-900 dark:text-white">
                     Historias recomendadas
                   </h3>
                 </div>
-                <span className="text-xs font-bold text-gray-400 flex items-center space-x-1">
+                <span className="hidden sm:flex text-xs font-bold text-gray-400 items-center space-x-1">
                   <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                   <span>Te puede interesar</span>
                 </span>
@@ -324,7 +324,7 @@ export default async function StoryPage({ params }: Props) {
                 {relatedArticles.slice(0, 3).map((rel) => (
                   <article
                     key={rel.id}
-                    className="flex flex-col bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800/80 rounded-3xl overflow-hidden shadow-xs card-hover-glow group"
+                    className="flex flex-col bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800/80 rounded-xl sm:rounded-2xl overflow-hidden shadow-sm card-hover-glow group"
                   >
                     {rel.featuredImage && isValidImageUrl(rel.featuredImage) ? (
                       <Link href={`/stories/${rel.slug}`} className="h-36 overflow-hidden bg-gray-200 dark:bg-gray-800 block">
@@ -341,7 +341,7 @@ export default async function StoryPage({ params }: Props) {
                         <BookOpen className="w-8 h-8" />
                       </Link>
                     )}
-                    <div className="p-5 space-y-2 flex-grow flex flex-col justify-between">
+                    <div className="p-4 sm:p-5 space-y-2 flex-grow flex flex-col justify-between">
                       <div>
                         {rel.category && (
                           <span className="text-[10px] font-extrabold text-brand-500 uppercase tracking-wider">
@@ -366,7 +366,7 @@ export default async function StoryPage({ params }: Props) {
                   {relatedArticles.slice(3, 6).map((rel) => (
                     <article
                       key={rel.id}
-                      className="flex flex-col bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800/80 rounded-3xl overflow-hidden shadow-xs card-hover-glow group"
+                      className="flex flex-col bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800/80 rounded-xl sm:rounded-2xl overflow-hidden shadow-sm card-hover-glow group"
                     >
                       {rel.featuredImage && isValidImageUrl(rel.featuredImage) ? (
                         <Link href={`/stories/${rel.slug}`} className="h-36 overflow-hidden bg-gray-200 dark:bg-gray-800 block">
@@ -383,7 +383,7 @@ export default async function StoryPage({ params }: Props) {
                           <BookOpen className="w-8 h-8" />
                         </Link>
                       )}
-                      <div className="p-5 space-y-2 flex-grow flex flex-col justify-between">
+                      <div className="p-4 sm:p-5 space-y-2 flex-grow flex flex-col justify-between">
                         <div>
                           {rel.category && (
                             <span className="text-[10px] font-extrabold text-brand-500 uppercase tracking-wider">

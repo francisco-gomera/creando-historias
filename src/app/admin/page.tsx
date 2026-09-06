@@ -22,25 +22,32 @@ export default async function AdminDashboardPage() {
 
       {/* Global Stat Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        {/* Card 1: Current Month Revenue */}
         <div className="p-4 sm:p-6 bg-gray-900 rounded-2xl border border-gray-800 space-y-2 shadow-xs">
           <div className="flex items-center justify-between text-gray-400 text-xs font-semibold">
-            <span>Visitas Totales Plataforma</span>
-            <Eye className="w-4 h-4 text-blue-400" />
-          </div>
-          <p className="text-2xl sm:text-3xl font-black text-white">{analytics.totalViews.toLocaleString()}</p>
-        </div>
-
-        <div className="p-4 sm:p-6 bg-gray-900 rounded-2xl border border-gray-800 space-y-2 shadow-xs">
-          <div className="flex items-center justify-between text-gray-400 text-xs font-semibold">
-            <span>Ingresos Estimados Brutos</span>
+            <span>Ingresos Mes en Curso</span>
             <DollarSign className="w-4 h-4 text-emerald-400" />
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-emerald-400">${revenue.grossEstimatedRevenue.toFixed(2)}</p>
+          <p className="text-2xl sm:text-3xl font-black text-emerald-400">${revenue.currentMonthGrossRevenue.toFixed(2)}</p>
           <p className="text-[11px] text-gray-400">
-            Plataforma: ${revenue.totalPlatformShare.toFixed(2)} ({revenue.settings.platformSharePercentage}%)
+            Plataforma: ${revenue.currentMonthPlatformShare.toFixed(2)} | Autores: ${revenue.currentMonthAuthorShare.toFixed(2)}
+          </p>
+          <p className="text-[10px] text-gray-500 italic">Reinicio a $0.00 al inicio de mes</p>
+        </div>
+
+        {/* Card 2: Today Revenue */}
+        <div className="p-4 sm:p-6 bg-gray-900 rounded-2xl border border-gray-800 space-y-2 shadow-xs">
+          <div className="flex items-center justify-between text-gray-400 text-xs font-semibold">
+            <span>Ingresos de Hoy</span>
+            <Eye className="w-4 h-4 text-blue-400" />
+          </div>
+          <p className="text-2xl sm:text-3xl font-black text-blue-400">${revenue.todayGrossRevenue.toFixed(2)}</p>
+          <p className="text-[11px] text-gray-400">
+            {revenue.todayViews.toLocaleString()} lecturas hoy
           </p>
         </div>
 
+        {/* Card 3: Pending Moderation */}
         <div className="p-4 sm:p-6 bg-gray-900 rounded-2xl border border-gray-800 space-y-2 shadow-xs">
           <div className="flex items-center justify-between text-gray-400 text-xs font-semibold">
             <span>Pendientes de Revisión</span>
@@ -53,12 +60,14 @@ export default async function AdminDashboardPage() {
           </Link>
         </div>
 
+        {/* Card 4: Total All Time & Users */}
         <div className="p-4 sm:p-6 bg-gray-900 rounded-2xl border border-gray-800 space-y-2 shadow-xs">
           <div className="flex items-center justify-between text-gray-400 text-xs font-semibold">
-            <span>Autores / Usuarios</span>
+            <span>Ingresos Totales (Histórico)</span>
             <Users className="w-4 h-4 text-purple-400" />
           </div>
-          <p className="text-2xl sm:text-3xl font-black text-white">{analytics.totalAuthors} / {analytics.totalUsers}</p>
+          <p className="text-2xl sm:text-3xl font-black text-white">${revenue.grossEstimatedRevenue.toFixed(2)}</p>
+          <p className="text-[11px] text-gray-400">{analytics.totalViews.toLocaleString()} vistas históricas | {analytics.totalAuthors} autores</p>
         </div>
       </div>
 

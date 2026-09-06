@@ -2,7 +2,7 @@
 
 Plataforma web de publicación editorial multiusuario basada en **Next.js 14 (App Router)**, **TypeScript**, **PostgreSQL**, **Prisma ORM**, y **Tailwind CSS**.
 
-Inspirada en las mejores características de plataformas como Medium, **EditorialSphere** está diseñada con un enfoque prioritario en la **seguridad de datos**, **control de acceso basado en roles y propiedad (RBAC/Ownership)**, **analítica de tráfico anónima** y un **motor de atribución de ingresos publicitarios (Google AdSense)** desacoplado.
+Inspirada en las mejores características de plataformas como Medium, **EditorialSphere** está diseñada con un enfoque prioritario en la **seguridad de datos**, **control de acceso basado en roles y propiedad (RBAC/Ownership)**, **analítica de tráfico anónima** y un **motor de atribución de ingresos publicitarios (Adsterra)** desacoplado.
 
 ---
 
@@ -20,10 +20,10 @@ Inspirada en las mejores características de plataformas como Medium, **Editoria
   - Edición exclusiva de sus propias publicaciones (protegido en backend contra accesos cruzados mediante guardias de propiedad).
   - Dashboard propio con estadísticas de vistas e ingresos estimados atribuidos.
 
-### 2. Atribución Transparente de Ingresos (AdSense Ready)
+### 2. Atribución Transparente de Ingresos (Adsterra Ready)
 - El sistema diferencia explícitamente entre **Ingresos Estimados** e **Ingresos Reales/Importados**.
 - Registra métricas de lecturas asociadas a `(articleId, authorId)` y aplica la fórmula de reparto configurada (ej. 70% Autor / 30% Plataforma).
-- Arquitectura desacoplada mediante `RevenueService` lista para conectar adaptadores de la API de AdSense o importar reportes CSV agregados.
+- Arquitectura desacoplada mediante `RevenueService` lista para estimar ingresos con RPM de Adsterra o importar reportes CSV agregados.
 
 ### 3. Analítica Respetuosa de la Privacidad
 - Tracking anónimo (`ArticleView`) con hashes SHA-256 (User-Agent + Salt + Fecha) sin almacenar direcciones IP completas para cumplimiento estricto de GDPR/Privacidad.
@@ -66,7 +66,7 @@ cp .env.example .env
 
 Asegúrate de configurar la cadena de conexión a PostgreSQL en `DATABASE_URL`:
 ```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/adsense_blog_db?schema=public"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/adsterra_blog_db?schema=public"
 JWT_SECRET="super-secret-jwt-key-change-this-in-production-min-32-chars"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 DEFAULT_PLATFORM_SHARE_PERCENTAGE="30"

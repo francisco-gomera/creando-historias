@@ -127,7 +127,7 @@ model RevenueRecord {
   impressions      Int      @default(0)
   estimatedRevenue Float    @default(0.0)
   currency         String   @default("USD")
-  source           String   @default("ADSENSE_ESTIMATE")
+  source           String   @default("ADSTERRA_ESTIMATE")
   createdAt        DateTime @default(now())
 
   article Article? @relation(fields: [articleId], references: [id], onDelete: SetNull)

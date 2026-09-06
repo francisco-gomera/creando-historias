@@ -36,4 +36,5 @@ export const CategorySchema = z.object({
 export const SettingsSchema = z.object({
   platformSharePercentage: z.number().min(0).max(100),
   authorSharePercentage: z.number().min(0).max(100),
+  rpmEstimate: z.number().min(0.01).optional(),
 });
