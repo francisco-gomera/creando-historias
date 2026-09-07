@@ -22,7 +22,7 @@ export default async function AuthorStoriesPage({ searchParams }: Props) {
 
   const articles = await prisma.article.findMany({
     where: { authorId: user.userId },
-    orderBy: { updatedAt: "desc" },
+    orderBy: { createdAt: "desc" },
     skip: (currentPage - 1) * pageSize,
     take: pageSize,
     include: { category: true },
@@ -81,7 +81,7 @@ export default async function AuthorStoriesPage({ searchParams }: Props) {
                     )}
                   </h2>
                   <p className="text-xs text-gray-400">
-                    Última modificación: {format(new Date(art.updatedAt), "dd/MM/yyyy HH:mm")}
+                    Creada: {format(new Date(art.createdAt), "dd/MM/yyyy HH:mm")}
                   </p>
                 </div>
 
