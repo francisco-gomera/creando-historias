@@ -40,10 +40,35 @@ function formatApiDate(date: Date): string {
 function toNumber(value: unknown): number {
   if (typeof value === "number") return Number.isFinite(value) ? value : 0;
   if (typeof value === "string") {
-    const parsed = parseFloat(value.replace(/[$,%\s]/g, ""));
+    let normalized = value
+      .trim()
+      .replace(/[$%\s]/g, "");
+
+    const hasComma = normalized.includes(",");
+    const hasDot = normalized.includes(".");
+    if (hasComma && hasDot) {
+      normalized =
+        normalized.lastIndexOf(",") > normalized.lastIndexOf(".")
+          ? normalized.replace(/\./g, "").replace(",", ".")
+          : normalized.replace(/,/g, "");
+    } else if (hasComma) {
+      normalized = normalized.replace(",", ".");
+    }
+
+    const parsed = parseFloat(normalized);
     return Number.isFinite(parsed) ? parsed : 0;
   }
   return 0;
+}
+
+function readField(item: Record<string, unknown>, aliases: string[]): unknown {
+  for (const alias of aliases) {
+    if (item[alias] !== undefined) return item[alias];
+  }
+
+  const lowerAliasSet = new Set(aliases.map((alias) => alias.toLowerCase()));
+  const matchedKey = Object.keys(item).find((key) => lowerAliasSet.has(key.toLowerCase()));
+  return matchedKey ? item[matchedKey] : undefined;
 }
 
 function getRows(payload: unknown): any[] {
@@ -53,6 +78,13 @@ function getRows(payload: unknown): any[] {
     for (const key of ["items", "data", "rows", "result", "statistics", "stats"]) {
       if (Array.isArray(record[key])) return record[key] as any[];
     }
+    if (
+      readField(record, ["impressions", "impression", "shows"]) !== undefined ||
+      readField(record, ["revenue", "profit", "earnings"]) !== undefined ||
+      readField(record, ["cpm", "CPM", "ecpm", "eCPM", "e_cpm"]) !== undefined
+    ) {
+      return [record];
+    }
   }
   return [];
 }
@@ -61,16 +93,21 @@ function normalizeStats(payload: unknown, isConfigured: boolean): AdsterraStatsS
   const rows = getRows(payload).map((row) => {
     const item = row as Record<string, unknown>;
     const labelValue =
-      item.date ?? item.domain ?? item.domain_id ?? item.placement ?? item.placement_id ??
-      item.country ?? item.placement_sub_id ?? item.title ?? "Total";
+      readField(item, ["date", "domain", "domain_id", "placement", "placement_id", "country", "placement_sub_id", "title"]) ??
+      "Total";
+    const impressions = toNumber(readField(item, ["impressions", "impression", "shows"]));
+    const clicks = toNumber(readField(item, ["clicks", "click"]));
+    const revenue = toNumber(readField(item, ["revenue", "profit", "earnings"]));
+    const ctr = toNumber(readField(item, ["ctr", "CTR"]));
+    const cpmFromApi = toNumber(readField(item, ["cpm", "CPM", "ecpm", "eCPM", "e_cpm"]));
 
     return {
       label: String(labelValue),
-      impressions: toNumber(item.impressions),
-      clicks: toNumber(item.clicks),
-      ctr: toNumber(item.ctr),
-      cpm: toNumber(item.cpm),
-      revenue: toNumber(item.revenue),
+      impressions,
+      clicks,
+      ctr: ctr || (impressions > 0 ? (clicks / impressions) * 100 : 0),
+      cpm: cpmFromApi || (impressions > 0 ? (revenue / impressions) * 1000 : 0),
+      revenue,
     };
   });
 
@@ -78,7 +115,14 @@ function normalizeStats(payload: unknown, isConfigured: boolean): AdsterraStatsS
   const clicks = rows.reduce((sum, row) => sum + row.clicks, 0);
   const revenue = rows.reduce((sum, row) => sum + row.revenue, 0);
   const ctr = impressions > 0 ? (clicks / impressions) * 100 : 0;
-  const cpm = impressions > 0 ? (revenue / impressions) * 1000 : 0;
+  const calculatedCpm = impressions > 0 ? (revenue / impressions) * 1000 : 0;
+  const weightedApiCpm =
+    impressions > 0
+      ? rows.reduce((sum, row) => sum + row.cpm * row.impressions, 0) / impressions
+      : rows.length > 0
+        ? rows.reduce((sum, row) => sum + row.cpm, 0) / rows.length
+        : 0;
+  const cpm = calculatedCpm || weightedApiCpm;
 
   return {
     isConfigured,
