@@ -1,6 +1,8 @@
 "use client";
 
 import AdsterraNativeBanner from "./AdsterraNativeBanner";
+import AdSlotTracker from "./AdSlotTracker";
+import { ADSTERRA_KEYS } from "@/lib/adsterra-config";
 
 interface SidebarAdProps {
   slotId?: string;
@@ -15,7 +17,9 @@ export default function SidebarAd({ slotId, className = "" }: SidebarAdProps) {
           Publicidad recomendada
         </span>
         <div className="w-full flex-grow flex flex-col justify-start items-center">
-          <AdsterraNativeBanner />
+          <AdSlotTracker placementId={slotId || "home-sidebar-native"} adKey={ADSTERRA_KEYS.nativeBanner}>
+            <AdsterraNativeBanner />
+          </AdSlotTracker>
         </div>
       </div>
     </div>

@@ -24,6 +24,15 @@ export const ADSTERRA_KEYS = {
   socialBarScript: "https://wailsilence.com/6a/94/d8/6a94d8ced66908f1c8e6e72a1022ef24.js",
 } as const;
 
+export const ADSTERRA_LAYOUT = {
+  maxInContentAds: Number(process.env.NEXT_PUBLIC_ADSTERRA_MAX_IN_CONTENT_ADS || 5),
+  firstInContentAfterParagraph: Number(process.env.NEXT_PUBLIC_ADSTERRA_FIRST_IN_CONTENT_AFTER_PARAGRAPH || 2),
+  paragraphsBetweenInContentAds: Number(process.env.NEXT_PUBLIC_ADSTERRA_PARAGRAPHS_BETWEEN_ADS || 5),
+  showStickyBottom: process.env.NEXT_PUBLIC_ADSTERRA_SHOW_STICKY_BOTTOM !== "false",
+  showArticleNativeHeader: process.env.NEXT_PUBLIC_ADSTERRA_SHOW_ARTICLE_NATIVE_HEADER !== "false",
+  showBelowArticleMobileAds: process.env.NEXT_PUBLIC_ADSTERRA_SHOW_BELOW_ARTICLE_MOBILE_ADS !== "false",
+} as const;
+
 export function isAdsterraRouteAllowed(pathname: string | null | undefined) {
   if (!pathname) return false;
   return !ADSTERRA_ROUTES_WITHOUT_ADS.some(

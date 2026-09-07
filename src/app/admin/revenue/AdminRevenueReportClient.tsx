@@ -268,6 +268,55 @@ export default function AdminRevenueReportClient({ report, periods }: AdminReven
       <section className="space-y-4">
         <div className="flex items-center justify-between border-b border-gray-800 pb-3">
           <div className="flex items-center space-x-2">
+            <RadioTower className="h-5 w-5 text-cyan-400" />
+            <h2 className="font-serif text-xl font-bold text-white">Rendimiento por ubicacion</h2>
+          </div>
+          <span className="text-xs font-semibold text-gray-400">
+            {report.adSlots.reduce((sum, slot) => sum + slot.internalImpressions, 0).toLocaleString()} impresiones internas
+          </span>
+        </div>
+
+        <div className="overflow-hidden rounded-3xl border border-gray-800 bg-gray-900 shadow-xs">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs text-gray-300">
+              <thead className="border-b border-gray-800 bg-gray-800/60 text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                <tr>
+                  <th className="p-4">Placement</th>
+                  <th className="p-4 text-right">Impresiones internas</th>
+                  <th className="p-4 text-right">Movil</th>
+                  <th className="p-4 text-right">Desktop</th>
+                  <th className="p-4 text-right">% exposicion</th>
+                  <th className="p-4 text-right">Revenue atribuido</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-800/60">
+                {report.adSlots.length === 0 ? (
+                  <tr>
+                    <td className="p-4 text-gray-400" colSpan={6}>
+                      Aun no hay impresiones internas por slot. Se empezaran a registrar cuando los lectores vean anuncios.
+                    </td>
+                  </tr>
+                ) : (
+                  report.adSlots.map((slot) => (
+                    <tr key={slot.placementId} className="transition hover:bg-gray-800/40">
+                      <td className="p-4 font-bold text-white">{slot.placementId}</td>
+                      <td className="p-4 text-right font-semibold">{slot.internalImpressions.toLocaleString()}</td>
+                      <td className="p-4 text-right text-emerald-300">{slot.mobileImpressions.toLocaleString()}</td>
+                      <td className="p-4 text-right text-blue-300">{slot.desktopImpressions.toLocaleString()}</td>
+                      <td className="p-4 text-right">{slot.sharePct.toFixed(2)}%</td>
+                      <td className="p-4 text-right font-black text-cyan-300">${slot.attributedRevenue.toFixed(2)}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div className="flex items-center justify-between border-b border-gray-800 pb-3">
+          <div className="flex items-center space-x-2">
             <FileSpreadsheet className="h-5 w-5 text-emerald-400" />
             <h2 className="font-serif text-xl font-bold text-white">Desglose de autores</h2>
           </div>

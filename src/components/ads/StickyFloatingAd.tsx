@@ -3,11 +3,14 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import AdsterraAd from "./AdsterraAd";
-import { ADSTERRA_KEYS } from "@/lib/adsterra-config";
+import AdSlotTracker from "./AdSlotTracker";
+import { ADSTERRA_KEYS, ADSTERRA_LAYOUT } from "@/lib/adsterra-config";
 
 interface StickyFloatingAdProps {
   slotId?: string;
   className?: string;
+  articleId?: string;
+  authorId?: string;
 }
 
 /**
@@ -15,7 +18,7 @@ interface StickyFloatingAdProps {
  * Uses dedicated banner key 6dbb818f76a41d9fd7b276a64638934f so it doesn't collide
  * with the 320x50 header banner (38e93328cc31a4d67bb5967d1a57b595).
  */
-export default function StickyFloatingAd({ slotId, className = "" }: StickyFloatingAdProps) {
+export default function StickyFloatingAd({ slotId, className = "", articleId, authorId }: StickyFloatingAdProps) {
   const [closed, setClosed] = useState(false);
   const [isFloatingDevice, setIsFloatingDevice] = useState<boolean | null>(null);
 
@@ -26,7 +29,7 @@ export default function StickyFloatingAd({ slotId, className = "" }: StickyFloat
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  if (closed || !isFloatingDevice) return null;
+  if (closed || !isFloatingDevice || !ADSTERRA_LAYOUT.showStickyBottom) return null;
 
   return (
     <div
@@ -45,11 +48,9 @@ export default function StickyFloatingAd({ slotId, className = "" }: StickyFloat
         className="w-full max-w-[468px] flex justify-center items-center overflow-hidden scale-90 sm:scale-100"
         style={{ minHeight: "52px", touchAction: "pan-y" }}
       >
-        <AdsterraAd
-          adKey={ADSTERRA_KEYS.display468x60}
-          width={468}
-          height={60}
-        />
+        <AdSlotTracker placementId={slotId || "sticky-bottom-468x60"} adKey={ADSTERRA_KEYS.display468x60} articleId={articleId} authorId={authorId}>
+          <AdsterraAd adKey={ADSTERRA_KEYS.display468x60} width={468} height={60} />
+        </AdSlotTracker>
       </div>
     </div>
   );

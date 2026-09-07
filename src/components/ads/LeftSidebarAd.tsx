@@ -1,14 +1,19 @@
 "use client";
 
 import AdsterraAd from "./AdsterraAd";
-import { ADSTERRA_KEYS } from "@/lib/adsterra-config";
+import AdSlotTracker from "./AdSlotTracker";
+import { ADSTERRA_KEYS, ADSTERRA_LAYOUT } from "@/lib/adsterra-config";
 
 interface LeftSidebarAdProps {
   className?: string;
   mobile?: boolean;
+  articleId?: string;
+  authorId?: string;
 }
 
-export default function LeftSidebarAd({ className = "", mobile = false }: LeftSidebarAdProps) {
+export default function LeftSidebarAd({ className = "", mobile = false, articleId, authorId }: LeftSidebarAdProps) {
+  if (mobile && !ADSTERRA_LAYOUT.showBelowArticleMobileAds) return null;
+
   const adCount = mobile ? 2 : 5;
 
   return (
@@ -25,11 +30,9 @@ export default function LeftSidebarAd({ className = "", mobile = false }: LeftSi
               className="w-full max-w-[320px] rounded-lg border border-gray-100/80 dark:border-gray-800/80 bg-gray-50/70 dark:bg-gray-950/30 p-1.5 overflow-hidden"
             >
               <div className="flex h-[50px] w-full items-center justify-center overflow-hidden">
-                <AdsterraAd
-                  adKey={ADSTERRA_KEYS.headerMobile320x50}
-                  width={320}
-                  height={50}
-                />
+                <AdSlotTracker placementId={`${mobile ? "article-mobile-below-content" : "article-left-sidebar"}-${index + 1}`} adKey={ADSTERRA_KEYS.headerMobile320x50} articleId={articleId} authorId={authorId}>
+                  <AdsterraAd adKey={ADSTERRA_KEYS.headerMobile320x50} width={320} height={50} />
+                </AdSlotTracker>
               </div>
             </div>
           ))}

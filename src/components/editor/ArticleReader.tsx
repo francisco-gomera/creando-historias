@@ -2,6 +2,7 @@
 
 import { optimizeHtmlImages } from "@/lib/images";
 import InContentAd from "@/components/ads/InContentAd";
+import { ADSTERRA_LAYOUT } from "@/lib/adsterra-config";
 
 interface ArticleReaderProps {
   content: string;
@@ -10,6 +11,8 @@ interface ArticleReaderProps {
   showInContentAd?: boolean;
   /** Maximum number of in-content ad placements. Defaults to 6. */
   maxInContentAds?: number;
+  articleId?: string;
+  authorId?: string;
 }
 
 function splitContentForInContentAds(html: string, maxAds: number) {
@@ -19,8 +22,8 @@ function splitContentForInContentAds(html: string, maxAds: number) {
   }
 
   const adParagraphIndexes: number[] = [];
-  const firstAdAfterParagraph = 3;
-  const paragraphsBetweenAds = 4;
+  const firstAdAfterParagraph = Math.max(1, ADSTERRA_LAYOUT.firstInContentAfterParagraph);
+  const paragraphsBetweenAds = Math.max(3, ADSTERRA_LAYOUT.paragraphsBetweenInContentAds);
   const minimumParagraphsAfterAd = 2;
 
   for (
@@ -53,7 +56,9 @@ export default function ArticleReader({
   content,
   className = "",
   showInContentAd = false,
-  maxInContentAds = 6,
+  maxInContentAds = ADSTERRA_LAYOUT.maxInContentAds,
+  articleId,
+  authorId,
 }: ArticleReaderProps) {
   const optimizedContent = optimizeHtmlImages(content);
   const contentParts = showInContentAd ? splitContentForInContentAds(optimizedContent, maxInContentAds) : null;
@@ -66,7 +71,9 @@ export default function ArticleReader({
         {contentParts.map((html, index) => (
           <div key={`article-content-chunk-${index}`}>
             <div dangerouslySetInnerHTML={{ __html: html }} />
-            {index < contentParts.length - 1 && <InContentAd index={index} className="max-w-[750px]" />}
+            {index < contentParts.length - 1 && (
+              <InContentAd index={index} className="max-w-[750px]" articleId={articleId} authorId={authorId} />
+            )}
           </div>
         ))}
       </div>

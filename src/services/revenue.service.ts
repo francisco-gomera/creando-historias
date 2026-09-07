@@ -24,6 +24,15 @@ export interface AuthorMonthlyBreakdown {
   status: "CALCULATED" | "SETTLED";
 }
 
+export interface AdSlotPerformance {
+  placementId: string;
+  internalImpressions: number;
+  mobileImpressions: number;
+  desktopImpressions: number;
+  sharePct: number;
+  attributedRevenue: number;
+}
+
 export type RevenueFilterType = "today" | "week" | "month" | "year" | "all" | "custom";
 export type RevenueSource = "ADSTERRA_API" | "RPM_ESTIMATE";
 
@@ -61,6 +70,7 @@ export interface MonthlyRevenueReport {
   isCurrentMonth: boolean;
   rpmEstimate: number;
   authors: AuthorMonthlyBreakdown[];
+  adSlots: AdSlotPerformance[];
 }
 
 const MONTH_NAMES = [
@@ -107,6 +117,53 @@ async function countViewsInRange(startDate?: Date, endDate?: Date, authorId?: st
 
 async function getPeriodStats(startDate?: Date, endDate?: Date) {
   return getAdsterraStats({ startDate, endDate, groupBy: "date" });
+}
+
+async function getAdSlotPerformance(startDate: Date | undefined, endDate: Date | undefined, grossRevenue: number): Promise<AdSlotPerformance[]> {
+  const where: any = {};
+  if (startDate || endDate) {
+    where.timestamp = {};
+    if (startDate) where.timestamp.gte = startDate;
+    if (endDate) where.timestamp.lte = endDate;
+  }
+
+  let impressions: Array<{ placementId: string; deviceType: string }>;
+
+  try {
+    impressions = await prisma.adSlotImpression.findMany({
+      where,
+      select: { placementId: true, deviceType: true },
+      take: 100000,
+    });
+  } catch (error) {
+    return [];
+  }
+
+  const slotMap = new Map<string, { total: number; mobile: number; desktop: number }>();
+
+  for (const row of impressions) {
+    const current = slotMap.get(row.placementId) || { total: 0, mobile: 0, desktop: 0 };
+    current.total += 1;
+    if (row.deviceType === "mobile") current.mobile += 1;
+    else current.desktop += 1;
+    slotMap.set(row.placementId, current);
+  }
+
+  const totalInternalImpressions = Array.from(slotMap.values()).reduce((sum, slot) => sum + slot.total, 0);
+
+  return Array.from(slotMap.entries())
+    .map(([placementId, slot]) => {
+      const sharePct = totalInternalImpressions > 0 ? (slot.total / totalInternalImpressions) * 100 : 0;
+      return {
+        placementId,
+        internalImpressions: slot.total,
+        mobileImpressions: slot.mobile,
+        desktopImpressions: slot.desktop,
+        sharePct: Math.round(sharePct * 100) / 100,
+        attributedRevenue: roundMoney(totalInternalImpressions > 0 ? grossRevenue * (slot.total / totalInternalImpressions) : 0),
+      };
+    })
+    .sort((a, b) => b.attributedRevenue - a.attributedRevenue || b.internalImpressions - a.internalImpressions);
 }
 
 export async function getMonetizationSettings(): Promise<MonetizationSettings> {
@@ -229,6 +286,7 @@ export async function getMonthlyRevenueReport(
   const periodRevenue = resolveRevenue(periodStats, totalViews, effectiveRpm);
   const todayRevenue = resolveRevenue(todayStats, todayViews, effectiveRpm);
   const monthRevenue = resolveRevenue(monthStats, currentMonthViews, effectiveRpm);
+  const adSlots = await getAdSlotPerformance(dateRange.startDate, dateRange.endDate, periodRevenue.revenue);
 
   const articleWhereClause: any = { status: "PUBLISHED" };
   if (dateRange.startDate || dateRange.endDate) {
@@ -334,6 +392,7 @@ export async function getMonthlyRevenueReport(
     isCurrentMonth,
     rpmEstimate: effectiveRpm,
     authors: authorsBreakdown,
+    adSlots,
   };
 }
 

@@ -2,9 +2,13 @@
 
 import { useEffect, useState } from "react";
 import AdsterraNativeBanner from "./AdsterraNativeBanner";
+import AdSlotTracker from "./AdSlotTracker";
+import { ADSTERRA_KEYS, ADSTERRA_LAYOUT } from "@/lib/adsterra-config";
 
 interface ArticleNativeAdProps {
   placement: "header" | "sidebar";
+  articleId?: string;
+  authorId?: string;
 }
 
 /**
@@ -13,7 +17,7 @@ interface ArticleNativeAdProps {
  * - On desktop (>= 1024px): renders in the right sidebar.
  * Ensures only ONE container exists in the DOM so Adsterra invoke.js fills it with 100% reliability.
  */
-export default function ArticleNativeAd({ placement }: ArticleNativeAdProps) {
+export default function ArticleNativeAd({ placement, articleId, authorId }: ArticleNativeAdProps) {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -25,14 +29,16 @@ export default function ArticleNativeAd({ placement }: ArticleNativeAdProps) {
 
   if (isMobile === null) return null;
 
-  if (isMobile && placement === "header") {
+  if (isMobile && placement === "header" && ADSTERRA_LAYOUT.showArticleNativeHeader) {
     return (
       <div className="w-full my-4">
         <div className="w-full bg-white dark:bg-gray-900/70 border border-gray-200/70 dark:border-gray-800/70 rounded-xl p-2.5 shadow-sm">
           <span className="text-[8px] font-semibold uppercase tracking-widest text-gray-400/80 dark:text-gray-600/80 mb-2 block text-center select-none">
             Publicidad recomendada
           </span>
-          <AdsterraNativeBanner />
+          <AdSlotTracker placementId="article-native-header" adKey={ADSTERRA_KEYS.nativeBanner} articleId={articleId} authorId={authorId}>
+            <AdsterraNativeBanner />
+          </AdSlotTracker>
         </div>
       </div>
     );
@@ -46,7 +52,9 @@ export default function ArticleNativeAd({ placement }: ArticleNativeAdProps) {
             Publicidad recomendada
           </span>
           <div className="w-full flex-grow flex flex-col justify-start items-center">
-            <AdsterraNativeBanner />
+            <AdSlotTracker placementId="article-native-sidebar" adKey={ADSTERRA_KEYS.nativeBanner} articleId={articleId} authorId={authorId}>
+              <AdsterraNativeBanner />
+            </AdSlotTracker>
           </div>
         </div>
       </div>

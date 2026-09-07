@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import AdsterraAd from "./AdsterraAd";
+import AdSlotTracker from "./AdSlotTracker";
 import { ADSTERRA_KEYS } from "@/lib/adsterra-config";
 
 interface InContentAdProps {
@@ -9,6 +10,8 @@ interface InContentAdProps {
   format?: string;
   className?: string;
   index?: number;
+  articleId?: string;
+  authorId?: string;
 }
 
 /**
@@ -16,7 +19,7 @@ interface InContentAdProps {
  * Mobile-first in-content placement.
  * Renders two stacked Adsterra banners per ad card for stronger fill inside articles.
  */
-export default function InContentAd({ slotId, format, className = "", index = 0 }: InContentAdProps) {
+export default function InContentAd({ slotId, format, className = "", index = 0, articleId, authorId }: InContentAdProps) {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -49,25 +52,18 @@ export default function InContentAd({ slotId, format, className = "", index = 0 
         <span className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-600 mb-1 select-none">
           Publicidad
         </span>
-        <div
-          className="flex max-w-full items-center justify-center overflow-hidden"
-          style={{ width: adConfig.width, height: adConfig.height }}
-        >
-          <AdsterraAd
-            adKey={adConfig.key}
-            width={adConfig.width}
-            height={adConfig.height}
-          />
-        </div>
+        <AdSlotTracker placementId={slotId || `article-in-content-${index + 1}-a`} adKey={adConfig.key} articleId={articleId} authorId={authorId}>
+          <div className="flex max-w-full items-center justify-center overflow-hidden" style={{ width: adConfig.width, height: adConfig.height }}>
+            <AdsterraAd adKey={adConfig.key} width={adConfig.width} height={adConfig.height} />
+          </div>
+        </AdSlotTracker>
         <div
           className="mt-1.5 flex max-w-full items-center justify-center overflow-hidden"
           style={{ width: adConfig.width, height: adConfig.height }}
         >
-          <AdsterraAd
-            adKey={adConfig.key}
-            width={adConfig.width}
-            height={adConfig.height}
-          />
+          <AdSlotTracker placementId={slotId || `article-in-content-${index + 1}-b`} adKey={adConfig.key} articleId={articleId} authorId={authorId}>
+            <AdsterraAd adKey={adConfig.key} width={adConfig.width} height={adConfig.height} />
+          </AdSlotTracker>
         </div>
       </div>
     </div>

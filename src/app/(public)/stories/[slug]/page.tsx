@@ -134,7 +134,7 @@ export default async function StoryPage({ params }: Props) {
       />
 
       {/* Header Ad Banner */}
-      <HeaderBannerAd />
+      <HeaderBannerAd articleId={article.id} authorId={article.author.id} />
 
       <div className="max-w-7xl mx-auto px-0 sm:px-6 py-2 sm:py-6 space-y-4 sm:space-y-6">
         {/* Navigation Breadcrumb */}
@@ -204,7 +204,7 @@ export default async function StoryPage({ params }: Props) {
                 )}
 
                 {/* Publicidad recomendada en móvil: debajo de título y subtítulo */}
-                <ArticleNativeAd placement="header" />
+                <ArticleNativeAd placement="header" articleId={article.id} authorId={article.author.id} />
 
                 {/* Author & Meta Row */}
                 <div className="flex items-center justify-between py-3 sm:py-4 border-y border-gray-100 dark:border-gray-800/80 text-sm text-gray-600 dark:text-gray-400 flex-wrap gap-3 sm:gap-4">
@@ -243,7 +243,7 @@ export default async function StoryPage({ params }: Props) {
 
               {/* Article Body */}
               <div itemProp="articleBody" className="font-sans text-gray-800 dark:text-gray-200 leading-relaxed text-base sm:text-lg">
-                <ArticleReader content={stripBase64FromHtml(article.content)} showInContentAd />
+                <ArticleReader content={stripBase64FromHtml(article.content)} showInContentAd articleId={article.id} authorId={article.author.id} />
               </div>
 
               {article.tags.length > 0 && (
@@ -299,7 +299,7 @@ export default async function StoryPage({ params }: Props) {
 
           {/* Mobile left sidebar placement: below content, before recommendations */}
           <aside className="lg:hidden w-full px-4 sm:px-0">
-            <LeftSidebarAd mobile />
+            <LeftSidebarAd mobile articleId={article.id} authorId={article.author.id} />
           </aside>
 
           {/* Recommendations Grid */}
@@ -409,13 +409,13 @@ export default async function StoryPage({ params }: Props) {
 
         {/* Right Sidebar with Native Ads (desktop) */}
         <aside className="hidden lg:block w-[300px] flex-shrink-0 space-y-6">
-          <ArticleNativeAd placement="sidebar" />
+          <ArticleNativeAd placement="sidebar" articleId={article.id} authorId={article.author.id} />
         </aside>
         </div>
       </div>
 
       {/* Sticky Floating Bottom Ad (mobile/tablet) */}
-      <StickyFloatingAd />
+      <StickyFloatingAd articleId={article.id} authorId={article.author.id} />
     </div>
   );
 }

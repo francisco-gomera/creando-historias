@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react";
 import AdsterraAd from "./AdsterraAd";
+import AdSlotTracker from "./AdSlotTracker";
 import { ADSTERRA_KEYS } from "@/lib/adsterra-config";
 
 interface HeaderBannerAdProps {
   slotId?: string;
   className?: string;
+  articleId?: string;
+  authorId?: string;
 }
 
 /**
@@ -16,7 +19,7 @@ interface HeaderBannerAdProps {
  * - Mobile (< 640px): 320x50 Mobile Leaderboard (key: 38e93328cc31a4d67bb5967d1a57b595)
  * Dynamically mounts ONLY the matching device script to prevent atOptions collisions and save bandwidth.
  */
-export default function HeaderBannerAd({ slotId, className = "" }: HeaderBannerAdProps) {
+export default function HeaderBannerAd({ slotId, className = "", articleId, authorId }: HeaderBannerAdProps) {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -39,11 +42,9 @@ export default function HeaderBannerAd({ slotId, className = "" }: HeaderBannerA
             className="flex justify-center items-center w-full min-h-[90px] overflow-hidden"
             style={{ touchAction: "pan-y" }}
           >
-            <AdsterraAd
-              adKey={ADSTERRA_KEYS.headerDesktop728x90}
-              width={728}
-              height={90}
-            />
+            <AdSlotTracker placementId={slotId || "header-desktop-728x90"} adKey={ADSTERRA_KEYS.headerDesktop728x90} articleId={articleId} authorId={authorId}>
+              <AdsterraAd adKey={ADSTERRA_KEYS.headerDesktop728x90} width={728} height={90} />
+            </AdSlotTracker>
           </div>
         )}
 
@@ -53,11 +54,9 @@ export default function HeaderBannerAd({ slotId, className = "" }: HeaderBannerA
             className="flex justify-center items-center w-full min-h-[50px] overflow-hidden"
             style={{ touchAction: "pan-y" }}
           >
-            <AdsterraAd
-              adKey={ADSTERRA_KEYS.headerMobile320x50}
-              width={320}
-              height={50}
-            />
+            <AdSlotTracker placementId={slotId || "header-mobile-320x50"} adKey={ADSTERRA_KEYS.headerMobile320x50} articleId={articleId} authorId={authorId}>
+              <AdsterraAd adKey={ADSTERRA_KEYS.headerMobile320x50} width={320} height={50} />
+            </AdSlotTracker>
           </div>
         )}
       </div>

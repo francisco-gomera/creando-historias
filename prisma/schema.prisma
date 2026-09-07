@@ -119,6 +119,24 @@ model ArticleView {
   @@index([timestamp])
 }
 
+model AdSlotImpression {
+  id                   String   @id @default(cuid())
+  placementId          String
+  adKey                String?
+  articleId            String?
+  authorId             String?
+  route                String?
+  country              String   @default("UNKNOWN")
+  deviceType           String   @default("desktop")
+  anonymousSessionHash String
+  timestamp            DateTime @default(now())
+
+  @@index([placementId, timestamp])
+  @@index([articleId, timestamp])
+  @@index([authorId, timestamp])
+  @@index([timestamp])
+}
+
 model RevenueRecord {
   id               String   @id @default(cuid())
   date             DateTime
