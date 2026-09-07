@@ -71,6 +71,11 @@ JWT_SECRET="super-secret-jwt-key-change-this-in-production-min-32-chars"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 DEFAULT_PLATFORM_SHARE_PERCENTAGE="30"
 DEFAULT_AUTHOR_SHARE_PERCENTAGE="70"
+NEXT_PUBLIC_ENABLE_ADSTERRA="true"
+ADSTERRA_API_KEY=""
+ADSTERRA_DOMAIN_ID=""
+ADSTERRA_PLACEMENT_ID=""
+ADSTERRA_COUNTRY=""
 ```
 
 ### 3. Migrar e Inicializar Base de Datos (Seed)

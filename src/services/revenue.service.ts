@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma";
+import { AdsterraStatsSummary, getAdsterraStats } from "./adsterra.service";
 
 export interface MonetizationSettings {
   platformSharePercentage: number;
@@ -24,6 +25,7 @@ export interface AuthorMonthlyBreakdown {
 }
 
 export type RevenueFilterType = "today" | "week" | "month" | "year" | "all" | "custom";
+export type RevenueSource = "ADSTERRA_API" | "RPM_ESTIMATE";
 
 export interface MonthlyRevenueReport {
   year: number;
@@ -33,25 +35,28 @@ export interface MonthlyRevenueReport {
   filterLabel: string;
   startDate?: Date;
   endDate?: Date;
-  
-  // Filtered period metrics
   totalViews: number;
   grossEstimatedRevenue: number;
   totalAuthorShareAmount: number;
   totalPlatformShareAmount: number;
-
-  // Today metrics
+  totalImpressions: number;
+  totalClicks: number;
+  ctr: number;
+  cpm: number;
+  revenueSource: RevenueSource;
+  adsterra: AdsterraStatsSummary;
   todayViews: number;
   todayGrossRevenue: number;
   todayAuthorShareAmount: number;
   todayPlatformShareAmount: number;
-
-  // Current month metrics
+  todayImpressions: number;
+  todayClicks: number;
   currentMonthViews: number;
   currentMonthGrossRevenue: number;
   currentMonthAuthorShareAmount: number;
   currentMonthPlatformShareAmount: number;
-
+  currentMonthImpressions: number;
+  currentMonthClicks: number;
   authorsCount: number;
   isCurrentMonth: boolean;
   rpmEstimate: number;
@@ -63,23 +68,58 @@ const MONTH_NAMES = [
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
+function roundMoney(value: number) {
+  return Math.round(value * 100) / 100;
+}
+
+function resolveRevenue(stats: AdsterraStatsSummary, views: number, rpm: number) {
+  if (stats.isLive) {
+    return {
+      source: "ADSTERRA_API" as const,
+      revenue: stats.revenue,
+      impressions: stats.impressions,
+      clicks: stats.clicks,
+      ctr: stats.ctr,
+      cpm: stats.cpm,
+    };
+  }
+
+  return {
+    source: "RPM_ESTIMATE" as const,
+    revenue: (views / 1000) * rpm,
+    impressions: views,
+    clicks: 0,
+    ctr: 0,
+    cpm: rpm,
+  };
+}
+
+async function countViewsInRange(startDate?: Date, endDate?: Date, authorId?: string) {
+  const where: any = {};
+  if (authorId) where.authorId = authorId;
+  if (startDate || endDate) {
+    where.timestamp = {};
+    if (startDate) where.timestamp.gte = startDate;
+    if (endDate) where.timestamp.lte = endDate;
+  }
+  return prisma.articleView.count({ where });
+}
+
+async function getPeriodStats(startDate?: Date, endDate?: Date) {
+  return getAdsterraStats({ startDate, endDate, groupBy: "date" });
+}
+
 export async function getMonetizationSettings(): Promise<MonetizationSettings> {
-  const platformSetting = await prisma.platformSetting.findUnique({
-    where: { key: "platformSharePercentage" },
-  });
-
-  const authorSetting = await prisma.platformSetting.findUnique({
-    where: { key: "authorSharePercentage" },
-  });
-
-  const rpmSetting = await prisma.platformSetting.findUnique({
-    where: { key: "rpmEstimate" },
-  });
+  const [platformSetting, authorSetting, rpmSetting] = await Promise.all([
+    prisma.platformSetting.findUnique({ where: { key: "platformSharePercentage" } }),
+    prisma.platformSetting.findUnique({ where: { key: "authorSharePercentage" } }),
+    prisma.platformSetting.findUnique({ where: { key: "rpmEstimate" } }),
+  ]);
 
   return {
     platformSharePercentage: platformSetting ? parseFloat(platformSetting.value) : 30,
     authorSharePercentage: authorSetting ? parseFloat(authorSetting.value) : 70,
-    rpmEstimate: rpmSetting ? parseFloat(rpmSetting.value) : 4.50,
+    rpmEstimate: rpmSetting ? parseFloat(rpmSetting.value) : 4.5,
   };
 }
 
@@ -126,14 +166,14 @@ export function getDateRangeForFilter(
     start.setDate(now.getDate() - 6);
     start.setHours(0, 0, 0, 0);
     const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-    return { startDate: start, endDate: end, label: "Últimos 7 Días" };
+    return { startDate: start, endDate: end, label: "Ultimos 7 dias" };
   }
 
   if (filter === "year") {
     const y = options?.year || now.getFullYear();
     const start = new Date(y, 0, 1, 0, 0, 0, 0);
     const end = new Date(y, 11, 31, 23, 59, 59, 999);
-    return { startDate: start, endDate: end, label: `Año ${y}` };
+    return { startDate: start, endDate: end, label: `Ano ${y}` };
   }
 
   if (filter === "all") {
@@ -150,18 +190,13 @@ export function getDateRangeForFilter(
     return { startDate: start, endDate: end, label: `${startStr} - ${endStr}` };
   }
 
-  // Default to month
   const targetYear = options?.year || now.getFullYear();
-  const targetMonth = options?.month || (now.getMonth() + 1);
+  const targetMonth = options?.month || now.getMonth() + 1;
   const start = new Date(targetYear, targetMonth - 1, 1, 0, 0, 0, 0);
   const end = new Date(targetYear, targetMonth, 0, 23, 59, 59, 999);
-  const monthName = MONTH_NAMES[targetMonth - 1];
-  return { startDate: start, endDate: end, label: `${monthName} ${targetYear}` };
+  return { startDate: start, endDate: end, label: `${MONTH_NAMES[targetMonth - 1]} ${targetYear}` };
 }
 
-/**
- * Generates a detailed revenue report with per-user breakdown and date filtering.
- */
 export async function getMonthlyRevenueReport(
   year?: number,
   month?: number,
@@ -172,28 +207,29 @@ export async function getMonthlyRevenueReport(
 ): Promise<MonthlyRevenueReport> {
   const defaultSettings = await getMonetizationSettings();
   const effectiveRpm = rpmOverride !== undefined && !isNaN(rpmOverride) ? rpmOverride : defaultSettings.rpmEstimate;
-
   const now = new Date();
   const targetYear = year || now.getFullYear();
-  const targetMonth = month || (now.getMonth() + 1);
-
-  // Date ranges
-  const dateRange = getDateRangeForFilter(filterType, {
-    year: targetYear,
-    month: targetMonth,
-    startDate: customStartDate,
-    endDate: customEndDate,
-  });
-
+  const targetMonth = month || now.getMonth() + 1;
+  const dateRange = getDateRangeForFilter(filterType, { year: targetYear, month: targetMonth, startDate: customStartDate, endDate: customEndDate });
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
   const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-
   const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
   const endOfCurrentMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+  const isCurrentMonth = targetYear === now.getFullYear() && targetMonth === now.getMonth() + 1;
 
-  const isCurrentMonth = targetYear === now.getFullYear() && targetMonth === (now.getMonth() + 1);
+  const [totalViews, todayViews, currentMonthViews, periodStats, todayStats, monthStats] = await Promise.all([
+    countViewsInRange(dateRange.startDate, dateRange.endDate),
+    countViewsInRange(startOfToday, endOfToday),
+    countViewsInRange(startOfCurrentMonth, endOfCurrentMonth),
+    getPeriodStats(dateRange.startDate, dateRange.endDate),
+    getPeriodStats(startOfToday, endOfToday),
+    getPeriodStats(startOfCurrentMonth, endOfCurrentMonth),
+  ]);
 
-  // Fetch users
+  const periodRevenue = resolveRevenue(periodStats, totalViews, effectiveRpm);
+  const todayRevenue = resolveRevenue(todayStats, todayViews, effectiveRpm);
+  const monthRevenue = resolveRevenue(monthStats, currentMonthViews, effectiveRpm);
+
   const articleWhereClause: any = { status: "PUBLISHED" };
   if (dateRange.startDate || dateRange.endDate) {
     articleWhereClause.publishedAt = {};
@@ -209,81 +245,40 @@ export async function getMonthlyRevenueReport(
       avatarUrl: true,
       role: true,
       customAuthorShare: true,
-      _count: {
-        select: {
-          articles: {
-            where: articleWhereClause,
-          },
-        },
-      },
+      _count: { select: { articles: { where: articleWhereClause } } },
     },
     orderBy: { name: "asc" },
   });
 
-  let totalViews = 0;
-  let grossEstimatedRevenue = 0;
   let totalAuthorShareAmount = 0;
   let totalPlatformShareAmount = 0;
-
-  let todayViews = 0;
-  let todayGrossRevenue = 0;
   let todayAuthorShareAmount = 0;
   let todayPlatformShareAmount = 0;
-
-  let currentMonthViews = 0;
-  let currentMonthGrossRevenue = 0;
   let currentMonthAuthorShareAmount = 0;
   let currentMonthPlatformShareAmount = 0;
-
   const authorsBreakdown: AuthorMonthlyBreakdown[] = [];
 
   for (const user of users) {
     const authorSharePct = user.customAuthorShare ?? defaultSettings.authorSharePercentage;
     const platformSharePct = 100 - authorSharePct;
+    const [userViews, userTodayViews, userMonthViews] = await Promise.all([
+      countViewsInRange(dateRange.startDate, dateRange.endDate, user.id),
+      countViewsInRange(startOfToday, endOfToday, user.id),
+      countViewsInRange(startOfCurrentMonth, endOfCurrentMonth, user.id),
+    ]);
 
-    // 1. Filtered period views
-    const viewWhereClause: any = { authorId: user.id };
-    if (dateRange.startDate || dateRange.endDate) {
-      viewWhereClause.timestamp = {};
-      if (dateRange.startDate) viewWhereClause.timestamp.gte = dateRange.startDate;
-      if (dateRange.endDate) viewWhereClause.timestamp.lte = dateRange.endDate;
-    }
-    const userViews = await prisma.articleView.count({ where: viewWhereClause });
-
-    const userGross = (userViews / 1000) * effectiveRpm;
+    const userGross = totalViews > 0 ? periodRevenue.revenue * (userViews / totalViews) : 0;
     const authorAmount = (userGross * authorSharePct) / 100;
     const platformAmount = (userGross * platformSharePct) / 100;
+    const todayGross = todayViews > 0 ? todayRevenue.revenue * (userTodayViews / todayViews) : 0;
+    const monthGross = currentMonthViews > 0 ? monthRevenue.revenue * (userMonthViews / currentMonthViews) : 0;
 
-    totalViews += userViews;
-    grossEstimatedRevenue += userGross;
     totalAuthorShareAmount += authorAmount;
     totalPlatformShareAmount += platformAmount;
-
-    // 2. Today views
-    const userTodayViews = await prisma.articleView.count({
-      where: {
-        authorId: user.id,
-        timestamp: { gte: startOfToday, lte: endOfToday },
-      },
-    });
-    const userTodayGross = (userTodayViews / 1000) * effectiveRpm;
-    todayViews += userTodayViews;
-    todayGrossRevenue += userTodayGross;
-    todayAuthorShareAmount += (userTodayGross * authorSharePct) / 100;
-    todayPlatformShareAmount += (userTodayGross * platformSharePct) / 100;
-
-    // 3. Current month views
-    const userMonthViews = await prisma.articleView.count({
-      where: {
-        authorId: user.id,
-        timestamp: { gte: startOfCurrentMonth, lte: endOfCurrentMonth },
-      },
-    });
-    const userMonthGross = (userMonthViews / 1000) * effectiveRpm;
-    currentMonthViews += userMonthViews;
-    currentMonthGrossRevenue += userMonthGross;
-    currentMonthAuthorShareAmount += (userMonthGross * authorSharePct) / 100;
-    currentMonthPlatformShareAmount += (userMonthGross * platformSharePct) / 100;
+    todayAuthorShareAmount += (todayGross * authorSharePct) / 100;
+    todayPlatformShareAmount += (todayGross * platformSharePct) / 100;
+    currentMonthAuthorShareAmount += (monthGross * authorSharePct) / 100;
+    currentMonthPlatformShareAmount += (monthGross * platformSharePct) / 100;
 
     authorsBreakdown.push({
       id: user.id,
@@ -293,18 +288,17 @@ export async function getMonthlyRevenueReport(
       role: user.role,
       articlesCount: user._count.articles,
       monthlyViews: userViews,
-      grossRevenue: Math.round(userGross * 100) / 100,
+      grossRevenue: roundMoney(userGross),
       authorSharePct,
       platformSharePct,
-      authorShareAmount: Math.round(authorAmount * 100) / 100,
-      platformShareAmount: Math.round(platformAmount * 100) / 100,
+      authorShareAmount: roundMoney(authorAmount),
+      platformShareAmount: roundMoney(platformAmount),
       isCustomShare: user.customAuthorShare !== null && user.customAuthorShare !== undefined,
       status: isCurrentMonth ? "CALCULATED" : "SETTLED",
     });
   }
 
-  // Sort authors by views/revenue descending
-  authorsBreakdown.sort((a, b) => b.monthlyViews - a.monthlyViews);
+  authorsBreakdown.sort((a, b) => b.grossRevenue - a.grossRevenue || b.monthlyViews - a.monthlyViews);
 
   return {
     year: targetYear,
@@ -315,20 +309,27 @@ export async function getMonthlyRevenueReport(
     startDate: dateRange.startDate,
     endDate: dateRange.endDate,
     totalViews,
-    grossEstimatedRevenue: Math.round(grossEstimatedRevenue * 100) / 100,
-    totalAuthorShareAmount: Math.round(totalAuthorShareAmount * 100) / 100,
-    totalPlatformShareAmount: Math.round(totalPlatformShareAmount * 100) / 100,
-
+    grossEstimatedRevenue: roundMoney(periodRevenue.revenue),
+    totalAuthorShareAmount: roundMoney(totalAuthorShareAmount),
+    totalPlatformShareAmount: roundMoney(totalPlatformShareAmount),
+    totalImpressions: periodRevenue.impressions,
+    totalClicks: periodRevenue.clicks,
+    ctr: periodRevenue.ctr,
+    cpm: periodRevenue.cpm,
+    revenueSource: periodRevenue.source,
+    adsterra: periodStats,
     todayViews,
-    todayGrossRevenue: Math.round(todayGrossRevenue * 100) / 100,
-    todayAuthorShareAmount: Math.round(todayAuthorShareAmount * 100) / 100,
-    todayPlatformShareAmount: Math.round(todayPlatformShareAmount * 100) / 100,
-
+    todayGrossRevenue: roundMoney(todayRevenue.revenue),
+    todayAuthorShareAmount: roundMoney(todayAuthorShareAmount),
+    todayPlatformShareAmount: roundMoney(todayPlatformShareAmount),
+    todayImpressions: todayRevenue.impressions,
+    todayClicks: todayRevenue.clicks,
     currentMonthViews,
-    currentMonthGrossRevenue: Math.round(currentMonthGrossRevenue * 100) / 100,
-    currentMonthAuthorShareAmount: Math.round(currentMonthAuthorShareAmount * 100) / 100,
-    currentMonthPlatformShareAmount: Math.round(currentMonthPlatformShareAmount * 100) / 100,
-
+    currentMonthGrossRevenue: roundMoney(monthRevenue.revenue),
+    currentMonthAuthorShareAmount: roundMoney(currentMonthAuthorShareAmount),
+    currentMonthPlatformShareAmount: roundMoney(currentMonthPlatformShareAmount),
+    currentMonthImpressions: monthRevenue.impressions,
+    currentMonthClicks: monthRevenue.clicks,
     authorsCount: authorsBreakdown.length,
     isCurrentMonth,
     rpmEstimate: effectiveRpm,
@@ -336,23 +337,25 @@ export async function getMonthlyRevenueReport(
   };
 }
 
-/**
- * Returns available monthly options for report filtering (last 12 months).
- */
 export function getAvailableMonthlyPeriods(): Array<{ year: number; month: number; label: string }> {
   const periods = [];
   const now = new Date();
 
   for (let i = 0; i < 12; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    periods.push({
-      year: d.getFullYear(),
-      month: d.getMonth() + 1,
-      label: `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`,
-    });
+    periods.push({ year: d.getFullYear(), month: d.getMonth() + 1, label: `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}` });
   }
 
   return periods;
+}
+
+function authorRevenueFromShare(grossRevenue: number, authorViews: number, platformViews: number, authorSharePercentage: number, platformSharePercentage: number) {
+  const attributedGross = platformViews > 0 ? grossRevenue * (authorViews / platformViews) : 0;
+  return {
+    gross: roundMoney(attributedGross),
+    author: roundMoney((attributedGross * authorSharePercentage) / 100),
+    platform: roundMoney((attributedGross * platformSharePercentage) / 100),
+  };
 }
 
 export async function calculateAuthorEstimatedRevenue(
@@ -368,161 +371,132 @@ export async function calculateAuthorEstimatedRevenue(
 ) {
   const defaultSettings = await getMonetizationSettings();
   const effectiveRpm = options?.rpm !== undefined && !isNaN(options.rpm) ? options.rpm : defaultSettings.rpmEstimate;
-
-  const authorUser = await prisma.user.findUnique({
-    where: { id: authorId },
-    select: { customAuthorShare: true },
-  });
-
+  const authorUser = await prisma.user.findUnique({ where: { id: authorId }, select: { customAuthorShare: true } });
   const authorSharePercentage = authorUser?.customAuthorShare ?? defaultSettings.authorSharePercentage;
   const platformSharePercentage = 100 - authorSharePercentage;
-
   const now = new Date();
+  const year = options?.year || now.getFullYear();
+  const month = options?.month || now.getMonth() + 1;
+  const filterType = options?.filter || "month";
+  const dateRange = getDateRangeForFilter(filterType, { year, month, startDate: options?.startDate, endDate: options?.endDate });
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
   const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-
   const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
   const endOfCurrentMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
 
-  const filterType = options?.filter || "month";
-  const dateRange = getDateRangeForFilter(filterType, {
-    year: options?.year,
-    month: options?.month,
-    startDate: options?.startDate,
-    endDate: options?.endDate,
-  });
+  const [
+    filteredViews,
+    todayViews,
+    currentMonthViews,
+    totalViews,
+    allFilteredViews,
+    allTodayViews,
+    allCurrentMonthViews,
+    allTimeViews,
+    periodStats,
+    todayStats,
+    monthStats,
+    allStats,
+  ] = await Promise.all([
+    countViewsInRange(dateRange.startDate, dateRange.endDate, authorId),
+    countViewsInRange(startOfToday, endOfToday, authorId),
+    countViewsInRange(startOfCurrentMonth, endOfCurrentMonth, authorId),
+    countViewsInRange(undefined, undefined, authorId),
+    countViewsInRange(dateRange.startDate, dateRange.endDate),
+    countViewsInRange(startOfToday, endOfToday),
+    countViewsInRange(startOfCurrentMonth, endOfCurrentMonth),
+    countViewsInRange(),
+    getPeriodStats(dateRange.startDate, dateRange.endDate),
+    getPeriodStats(startOfToday, endOfToday),
+    getPeriodStats(startOfCurrentMonth, endOfCurrentMonth),
+    getPeriodStats(),
+  ]);
 
-  // Filtered views
-  const filterWhere: any = { authorId };
-  if (dateRange.startDate || dateRange.endDate) {
-    filterWhere.timestamp = {};
-    if (dateRange.startDate) filterWhere.timestamp.gte = dateRange.startDate;
-    if (dateRange.endDate) filterWhere.timestamp.lte = dateRange.endDate;
-  }
-  const filteredViews = await prisma.articleView.count({ where: filterWhere });
-
-  // Today views
-  const todayViews = await prisma.articleView.count({
-    where: { authorId, timestamp: { gte: startOfToday, lte: endOfToday } },
-  });
-
-  // Current month views
-  const currentMonthViews = await prisma.articleView.count({
-    where: { authorId, timestamp: { gte: startOfCurrentMonth, lte: endOfCurrentMonth } },
-  });
-
-  // Total views all time
-  const totalViews = await prisma.articleView.count({ where: { authorId } });
-
-  // Revenue calculations
-  const calculateRevenue = (views: number) => {
-    const gross = (views / 1000) * effectiveRpm;
-    const author = (gross * authorSharePercentage) / 100;
-    const platform = (gross * platformSharePercentage) / 100;
-    return {
-      gross: Math.round(gross * 100) / 100,
-      author: Math.round(author * 100) / 100,
-      platform: Math.round(platform * 100) / 100,
-    };
-  };
-
-  const filteredCalc = calculateRevenue(filteredViews);
-  const todayCalc = calculateRevenue(todayViews);
-  const monthCalc = calculateRevenue(currentMonthViews);
-  const totalCalc = calculateRevenue(totalViews);
+  const filteredResolved = resolveRevenue(periodStats, allFilteredViews, effectiveRpm);
+  const todayResolved = resolveRevenue(todayStats, allTodayViews, effectiveRpm);
+  const monthResolved = resolveRevenue(monthStats, allCurrentMonthViews, effectiveRpm);
+  const allResolved = resolveRevenue(allStats, allTimeViews, effectiveRpm);
+  const filteredCalc = authorRevenueFromShare(filteredResolved.revenue, filteredViews, allFilteredViews, authorSharePercentage, platformSharePercentage);
+  const todayCalc = authorRevenueFromShare(todayResolved.revenue, todayViews, allTodayViews, authorSharePercentage, platformSharePercentage);
+  const monthCalc = authorRevenueFromShare(monthResolved.revenue, currentMonthViews, allCurrentMonthViews, authorSharePercentage, platformSharePercentage);
+  const totalCalc = authorRevenueFromShare(allResolved.revenue, totalViews, allTimeViews, authorSharePercentage, platformSharePercentage);
 
   return {
     authorId,
+    year,
+    month,
     rpmEstimate: effectiveRpm,
+    revenueSource: filteredResolved.source,
+    adsterra: periodStats,
+    totalImpressions: filteredResolved.impressions,
+    totalClicks: filteredResolved.clicks,
+    ctr: filteredResolved.ctr,
+    cpm: filteredResolved.cpm,
     filterType,
     filterLabel: dateRange.label,
     startDate: dateRange.startDate,
     endDate: dateRange.endDate,
-
-    // Filtered
     filteredViews,
     grossEstimatedRevenue: filteredCalc.gross,
     authorShareAmount: filteredCalc.author,
     platformShareAmount: filteredCalc.platform,
-
-    // Today
     todayViews,
     todayGrossRevenue: todayCalc.gross,
     todayAuthorShareAmount: todayCalc.author,
-
-    // Current Month
     currentMonthViews,
     currentMonthGrossRevenue: monthCalc.gross,
     currentMonthAuthorShareAmount: monthCalc.author,
-
-    // All time
     totalViews,
     totalGrossRevenue: totalCalc.gross,
     totalAuthorShareAmount: totalCalc.author,
-
     platformSharePercentage,
     authorSharePercentage,
     isCustomShare: authorUser?.customAuthorShare !== null && authorUser?.customAuthorShare !== undefined,
-    isEstimate: true,
+    isEstimate: filteredResolved.source === "RPM_ESTIMATE",
   };
 }
 
 export async function getGlobalRevenueSummary(rpmOverride?: number) {
   const defaultSettings = await getMonetizationSettings();
   const effectiveRpm = rpmOverride !== undefined && !isNaN(rpmOverride) ? rpmOverride : defaultSettings.rpmEstimate;
-
   const now = new Date();
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
   const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-
   const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
   const endOfCurrentMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
 
-  // Today
-  const todayViews = await prisma.articleView.count({
-    where: { timestamp: { gte: startOfToday, lte: endOfToday } },
-  });
-  const todayGrossRevenue = (todayViews / 1000) * effectiveRpm;
+  const [todayViews, currentMonthViews, totalViews, todayStats, monthStats, allStats] = await Promise.all([
+    countViewsInRange(startOfToday, endOfToday),
+    countViewsInRange(startOfCurrentMonth, endOfCurrentMonth),
+    countViewsInRange(),
+    getPeriodStats(startOfToday, endOfToday),
+    getPeriodStats(startOfCurrentMonth, endOfCurrentMonth),
+    getPeriodStats(),
+  ]);
 
-  // Current Month
-  const currentMonthViews = await prisma.articleView.count({
-    where: { timestamp: { gte: startOfCurrentMonth, lte: endOfCurrentMonth } },
-  });
-  const currentMonthGrossRevenue = (currentMonthViews / 1000) * effectiveRpm;
-  const currentMonthAuthorShare = (currentMonthGrossRevenue * defaultSettings.authorSharePercentage) / 100;
-  const currentMonthPlatformShare = (currentMonthGrossRevenue * defaultSettings.platformSharePercentage) / 100;
-
-  // All time
-  const totalViews = await prisma.articleView.count();
-  const grossEstimatedRevenue = (totalViews / 1000) * effectiveRpm;
-  const totalAuthorShare = (grossEstimatedRevenue * defaultSettings.authorSharePercentage) / 100;
-  const totalPlatformShare = (grossEstimatedRevenue * defaultSettings.platformSharePercentage) / 100;
-
-  const importedRevenueRecords = await prisma.revenueRecord.findMany({
-    where: { source: "MANUAL_IMPORT" },
-  });
-  const totalImportedRevenue = importedRevenueRecords.reduce((acc, curr) => acc + curr.estimatedRevenue, 0);
+  const todayRevenue = resolveRevenue(todayStats, todayViews, effectiveRpm);
+  const monthRevenue = resolveRevenue(monthStats, currentMonthViews, effectiveRpm);
+  const allRevenue = resolveRevenue(allStats, totalViews, effectiveRpm);
 
   return {
     rpmEstimate: effectiveRpm,
-    
-    // Today
+    revenueSource: allRevenue.source,
+    adsterra: allStats,
     todayViews,
-    todayGrossRevenue: Math.round(todayGrossRevenue * 100) / 100,
-
-    // Current Month (Resets to 0 at start of month!)
+    todayGrossRevenue: roundMoney(todayRevenue.revenue),
+    todayImpressions: todayRevenue.impressions,
+    todayClicks: todayRevenue.clicks,
     currentMonthViews,
-    currentMonthGrossRevenue: Math.round(currentMonthGrossRevenue * 100) / 100,
-    currentMonthAuthorShare: Math.round(currentMonthAuthorShare * 100) / 100,
-    currentMonthPlatformShare: Math.round(currentMonthPlatformShare * 100) / 100,
-
-    // All time
+    currentMonthGrossRevenue: roundMoney(monthRevenue.revenue),
+    currentMonthAuthorShare: roundMoney((monthRevenue.revenue * defaultSettings.authorSharePercentage) / 100),
+    currentMonthPlatformShare: roundMoney((monthRevenue.revenue * defaultSettings.platformSharePercentage) / 100),
+    currentMonthImpressions: monthRevenue.impressions,
+    currentMonthClicks: monthRevenue.clicks,
     totalViews,
-    grossEstimatedRevenue: Math.round(grossEstimatedRevenue * 100) / 100,
-    totalAuthorShare: Math.round(totalAuthorShare * 100) / 100,
-    totalPlatformShare: Math.round(totalPlatformShare * 100) / 100,
-    totalImportedRevenue: Math.round(totalImportedRevenue * 100) / 100,
-
+    grossEstimatedRevenue: roundMoney(allRevenue.revenue),
+    totalAuthorShare: roundMoney((allRevenue.revenue * defaultSettings.authorSharePercentage) / 100),
+    totalPlatformShare: roundMoney((allRevenue.revenue * defaultSettings.platformSharePercentage) / 100),
+    totalImportedRevenue: 0,
     settings: defaultSettings,
   };
 }

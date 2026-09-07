@@ -55,7 +55,7 @@ export default function SettingsForm({ settings }: { settings: any }) {
       <div className="space-y-4">
         <div>
           <label className="block text-xs font-semibold text-gray-300 mb-1">
-            Estimacion de RPM de Adsterra ($ por 1,000 impresiones)
+            RPM de respaldo de Adsterra ($ por 1,000 impresiones)
           </label>
           <input
             type="number"
@@ -66,7 +66,7 @@ export default function SettingsForm({ settings }: { settings: any }) {
             className="w-full p-3 bg-gray-800 border border-gray-700 rounded-xl text-white font-bold text-lg"
           />
           <p className="text-[11px] text-gray-400 mt-1">
-            Este valor se utiliza para calcular la ganancia bruta estimada por cada 1,000 visitas.
+            Este valor solo se utiliza si la API de Adsterra no esta configurada o no responde.
           </p>
         </div>
 
