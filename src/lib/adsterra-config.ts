@@ -24,7 +24,7 @@ export const ADSTERRA_KEYS = {
   nativeBannerSidebar: process.env.NEXT_PUBLIC_ADSTERRA_NATIVE_BANNER_SIDEBAR || "666fc12a09a07ad15eeca1a70b387d4b",
   popunderScript: process.env.NEXT_PUBLIC_ADSTERRA_POPUNDER_SCRIPT || "https://wailsilence.com/5a/77/9f/5a779ffcc3c9736641795d9d4408d678.js",
   socialBarScript: process.env.NEXT_PUBLIC_ADSTERRA_SOCIAL_BAR_SCRIPT || "https://wailsilence.com/6a/94/d8/6a94d8ced66908f1c8e6e72a1022ef24.js",
-  smartlinkUrl: process.env.NEXT_PUBLIC_ADSTERRA_SMARTLINK_URL || "",
+  smartlinkUrl: process.env.NEXT_PUBLIC_ADSTERRA_SMARTLINK_URL || "https://wailsilence.com/tb6f07jgez?key=7204855da51379426dbb0d5c6c8933b7",
 } as const;
 
 export const ADSTERRA_LAYOUT = {
