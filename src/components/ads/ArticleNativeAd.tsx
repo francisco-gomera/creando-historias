@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import AdsterraNativeBanner from "./AdsterraNativeBanner";
 import AdSlotTracker from "./AdSlotTracker";
+import SidebarDesktopBanners from "./SidebarDesktopBanners";
 import { ADSTERRA_KEYS, ADSTERRA_LAYOUT } from "@/lib/adsterra-config";
 
 interface ArticleNativeAdProps {
@@ -46,8 +47,8 @@ export default function ArticleNativeAd({ placement, articleId, authorId }: Arti
 
   if (!isMobile && placement === "sidebar") {
     return (
-      <div className="w-full sticky top-20">
-        <div className="w-full min-h-[880px] bg-white/70 dark:bg-gray-900/50 border border-gray-200/50 dark:border-gray-800/50 rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-start text-center overflow-hidden shadow-xs">
+      <div className="w-full space-y-5">
+        <div className="w-full min-h-[340px] bg-white/70 dark:bg-gray-900/50 border border-gray-200/50 dark:border-gray-800/50 rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-start text-center overflow-hidden shadow-xs">
           <span className="text-[9px] font-semibold uppercase tracking-widest text-gray-400/70 dark:text-gray-600/70 mb-2.5 select-none">
             Publicidad recomendada
           </span>
@@ -57,6 +58,9 @@ export default function ArticleNativeAd({ placement, articleId, authorId }: Arti
             </AdSlotTracker>
           </div>
         </div>
+
+        {/* Todos los banners de Adsterra apilados en el lateral en escritorio */}
+        <SidebarDesktopBanners prefix="article-right-sidebar" articleId={articleId} authorId={authorId} />
       </div>
     );
   }

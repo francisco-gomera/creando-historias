@@ -4,6 +4,9 @@ import Pagination from "@/components/common/Pagination";
 import HeaderBannerAd from "@/components/ads/HeaderBannerAd";
 import SidebarAd from "@/components/ads/SidebarAd";
 import StickyFloatingAd from "@/components/ads/StickyFloatingAd";
+import AdsterraAd from "@/components/ads/AdsterraAd";
+import AdSlotTracker from "@/components/ads/AdSlotTracker";
+import { ADSTERRA_KEYS } from "@/lib/adsterra-config";
 import { ArrowRight, BookOpen, Clock, Folder, TrendingUp, User, Zap } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
@@ -134,6 +137,20 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               </div>
             </section>
           )}
+
+          {/* Banner publicitario intermedio en escritorio */}
+          <div className="hidden lg:flex justify-center my-3">
+            <div className="inline-flex flex-col items-center justify-center overflow-hidden rounded-xl border border-gray-200/70 bg-white p-2 text-center shadow-sm dark:border-gray-800/70 dark:bg-gray-900/70">
+              <span className="text-[8px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-600 mb-1 select-none">
+                Publicidad
+              </span>
+              <div className="w-[468px] h-[60px] flex items-center justify-center overflow-hidden">
+                <AdSlotTracker placementId="home-middle-feed-468x60" adKey={ADSTERRA_KEYS.display468x60}>
+                  <AdsterraAd adKey={ADSTERRA_KEYS.display468x60} width={468} height={60} />
+                </AdSlotTracker>
+              </div>
+            </div>
+          </div>
 
           <section className="space-y-4 sm:space-y-5">
             <div className="flex items-center space-x-2 px-4 sm:px-0">

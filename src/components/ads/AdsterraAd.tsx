@@ -68,11 +68,19 @@ export default function AdsterraAd({
             `;
             container.appendChild(optionsScript);
 
+            const timer = setTimeout(() => resolve(), 2500);
+
             const invokeScript = document.createElement("script");
             invokeScript.src = `https://wailsilence.com/${adKey}/invoke.js`;
             invokeScript.async = false;
-            invokeScript.onload = () => resolve();
-            invokeScript.onerror = () => resolve();
+            invokeScript.onload = () => {
+              clearTimeout(timer);
+              resolve();
+            };
+            invokeScript.onerror = () => {
+              clearTimeout(timer);
+              resolve();
+            };
             container.appendChild(invokeScript);
           })
       );
