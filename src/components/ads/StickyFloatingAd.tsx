@@ -45,7 +45,7 @@ export default function StickyFloatingAd({ slotId, className = "", articleId, au
         <X className="w-3.5 h-3.5" />
       </button>
       <div
-        className="w-full max-w-[468px] flex justify-center items-center overflow-hidden scale-90 sm:scale-100"
+        className="w-full max-w-[468px] flex justify-center items-center overflow-hidden scale-[0.70] sm:scale-95 md:scale-100 origin-center"
         style={{ minHeight: "52px", touchAction: "pan-y" }}
       >
         <AdSlotTracker placementId={slotId || "sticky-bottom-468x60"} adKey={ADSTERRA_KEYS.display468x60} articleId={articleId} authorId={authorId}>

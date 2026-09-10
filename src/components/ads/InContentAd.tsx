@@ -33,7 +33,7 @@ export default function InContentAd({ slotId, format, className = "", index = 0,
   if (isMobile === null) return null;
 
   const ad1 = isMobile
-    ? { key: ADSTERRA_KEYS.headerMobile320x50, width: 320, height: 50 }
+    ? { key: ADSTERRA_KEYS.banner300x250, width: 300, height: 250 }
     : { key: ADSTERRA_KEYS.headerDesktop728x90, width: 728, height: 90 };
 
   const ad2 = isMobile

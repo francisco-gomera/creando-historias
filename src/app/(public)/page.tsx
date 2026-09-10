@@ -138,14 +138,21 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             </section>
           )}
 
-          {/* Banner publicitario intermedio en escritorio */}
-          <div className="hidden lg:flex justify-center my-3">
-            <div className="inline-flex flex-col items-center justify-center overflow-hidden rounded-xl border border-gray-200/70 bg-white p-2 text-center shadow-sm dark:border-gray-800/70 dark:bg-gray-900/70">
+          {/* Banner publicitario intermedio en feed (300x250 en móvil, 468x60 en escritorio) */}
+          <div className="flex justify-center my-3 sm:my-5 px-2 sm:px-0">
+            <div className="inline-flex flex-col items-center justify-center overflow-hidden rounded-xl sm:rounded-2xl border border-gray-200/70 bg-white p-2 text-center shadow-sm dark:border-gray-800/70 dark:bg-gray-900/70">
               <span className="text-[8px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-600 mb-1 select-none">
                 Publicidad
               </span>
-              <div className="w-[468px] h-[60px] flex items-center justify-center overflow-hidden">
-                <AdSlotTracker placementId="home-middle-feed-468x60" adKey={ADSTERRA_KEYS.display468x60}>
+              {/* En móvil: 300x250 */}
+              <div className="flex sm:hidden w-[300px] h-[250px] items-center justify-center overflow-hidden">
+                <AdSlotTracker placementId="home-middle-feed-mobile-300x250" adKey={ADSTERRA_KEYS.banner300x250}>
+                  <AdsterraAd adKey={ADSTERRA_KEYS.banner300x250} width={300} height={250} />
+                </AdSlotTracker>
+              </div>
+              {/* En escritorio: 468x60 */}
+              <div className="hidden sm:flex w-[468px] h-[60px] items-center justify-center overflow-hidden">
+                <AdSlotTracker placementId="home-middle-feed-desktop-468x60" adKey={ADSTERRA_KEYS.display468x60}>
                   <AdsterraAd adKey={ADSTERRA_KEYS.display468x60} width={468} height={60} />
                 </AdSlotTracker>
               </div>
