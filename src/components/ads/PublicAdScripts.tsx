@@ -28,10 +28,14 @@ export default function PublicAdScripts() {
   useEffect(() => {
     if (!ADSTERRA_ADS_ENABLED || !isAdsterraRouteAllowed(pathname)) return;
     if (!ADSTERRA_INTRUSIVE_FORMATS_ENABLED) return;
-    if (window.innerWidth < DESKTOP_MIN_WIDTH) return;
 
+    // Social Bar (e Interstitial): Activo en todos los dispositivos (móvil, tablet y escritorio)
     appendAdsterraScript("adsterra-social-bar", ADSTERRA_KEYS.socialBarScript);
-    appendAdsterraScript("adsterra-popunder", ADSTERRA_KEYS.popunderScript);
+
+    // Popunder: Se mantiene en pantallas de escritorio para evitar secuestro de clics en móviles
+    if (window.innerWidth >= DESKTOP_MIN_WIDTH) {
+      appendAdsterraScript("adsterra-popunder", ADSTERRA_KEYS.popunderScript);
+    }
   }, [pathname]);
 
   return null;
