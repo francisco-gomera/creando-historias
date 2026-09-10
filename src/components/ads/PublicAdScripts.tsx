@@ -9,7 +9,8 @@ import {
   isAdsterraRouteAllowed,
 } from "@/lib/adsterra-config";
 
-const DESKTOP_MIN_WIDTH = 1024;
+const POPUNDER_STORAGE_KEY = "adsterra_popunder_last_shown";
+const POPUNDER_COOLDOWN_MS = 2 * 60 * 60 * 1000; // 2 horas de enfriamiento
 
 function appendAdsterraScript(id: string, src: string) {
   if (document.getElementById(id)) return;
@@ -22,6 +23,34 @@ function appendAdsterraScript(id: string, src: string) {
   document.body.appendChild(script);
 }
 
+function shouldLoadPopunder(): boolean {
+  try {
+    if (typeof window === "undefined") return false;
+    // 1. Si ya se disparó en la sesión/pestaña actual, no volver a cargarlo
+    if (sessionStorage.getItem("adsterra_popunder_session_fired") === "true") {
+      return false;
+    }
+    // 2. Control de enfriamiento para no repetir al recargar o reabrir
+    const lastShown = localStorage.getItem(POPUNDER_STORAGE_KEY);
+    if (lastShown) {
+      const elapsed = Date.now() - parseInt(lastShown, 10);
+      if (elapsed < POPUNDER_COOLDOWN_MS) {
+        return false;
+      }
+    }
+  } catch {
+    // Si cookies o storage están bloqueados
+  }
+  return true;
+}
+
+function markPopunderFired() {
+  try {
+    localStorage.setItem(POPUNDER_STORAGE_KEY, Date.now().toString());
+    sessionStorage.setItem("adsterra_popunder_session_fired", "true");
+  } catch {}
+}
+
 export default function PublicAdScripts() {
   const pathname = usePathname();
 
@@ -32,10 +61,44 @@ export default function PublicAdScripts() {
     // Social Bar (e Interstitial): Activo en todos los dispositivos (móvil, tablet y escritorio)
     appendAdsterraScript("adsterra-social-bar", ADSTERRA_KEYS.socialBarScript);
 
-    // Popunder: Se mantiene en pantallas de escritorio para evitar secuestro de clics en móviles
-    if (window.innerWidth >= DESKTOP_MIN_WIDTH) {
-      appendAdsterraScript("adsterra-popunder", ADSTERRA_KEYS.popunderScript);
+    // Popunder controlado: Disponible en móvil y escritorio con protección anti-secuestro de clics
+    if (!shouldLoadPopunder()) {
+      return;
     }
+
+    const isMobile = window.innerWidth < 1024;
+
+    const setupPopunder = () => {
+      appendAdsterraScript("adsterra-popunder", ADSTERRA_KEYS.popunderScript);
+
+      const handleFirstInteraction = () => {
+        markPopunderFired();
+        // En móviles, remover el nodo del script tras 2 segundos para liberar los clics posteriores
+        if (isMobile) {
+          setTimeout(() => {
+            const el = document.getElementById("adsterra-popunder");
+            if (el) el.remove();
+          }, 2000);
+        }
+        window.removeEventListener("click", handleFirstInteraction, true);
+        window.removeEventListener("touchend", handleFirstInteraction, true);
+      };
+
+      window.addEventListener("click", handleFirstInteraction, true);
+      window.addEventListener("touchend", handleFirstInteraction, true);
+    };
+
+    // En móviles damos 2.5 segundos de cortesía para que el usuario pueda empezar a leer sin interrupciones inmediatas
+    let timer: NodeJS.Timeout | null = null;
+    if (isMobile) {
+      timer = setTimeout(setupPopunder, 2500);
+    } else {
+      setupPopunder();
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, [pathname]);
 
   return null;
