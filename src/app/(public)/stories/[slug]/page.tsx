@@ -7,6 +7,7 @@ import ArticleNativeAd from "@/components/ads/ArticleNativeAd";
 import LeftSidebarAd from "@/components/ads/LeftSidebarAd";
 import StickyFloatingAd from "@/components/ads/StickyFloatingAd";
 import HeaderBannerAd from "@/components/ads/HeaderBannerAd";
+import AdsterraSmartlink from "@/components/ads/AdsterraSmartlink";
 import CopyLinkButton from "@/components/common/CopyLinkButton";
 import AnalyticsTracker from "@/components/analytics/AnalyticsTracker";
 import { Clock, Calendar, ArrowLeft, BookOpen, Sparkles, User } from "lucide-react";
@@ -302,6 +303,11 @@ export default async function StoryPage({ params }: Props) {
             <LeftSidebarAd mobile articleId={article.id} authorId={article.author.id} />
           </aside>
 
+          {/* Smartlink patrocinado destacado */}
+          <div className="w-full px-4 sm:px-0">
+            <AdsterraSmartlink variant="card" />
+          </div>
+
           {/* Recommendations Grid */}
           {relatedArticles.length > 0 && (
             <section className="space-y-5 px-4 sm:px-0">
@@ -316,7 +322,7 @@ export default async function StoryPage({ params }: Props) {
                 </div>
                 <span className="hidden sm:flex text-xs font-bold text-gray-400 items-center space-x-1">
                   <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Te puede interesar</span>
+                  <span>Continúa leyendo</span>
                 </span>
               </div>
 

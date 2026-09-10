@@ -17,8 +17,8 @@ export default function SidebarAd({ slotId, className = "" }: SidebarAdProps) {
           Publicidad recomendada
         </span>
         <div className="w-full flex-grow flex flex-col justify-start items-center">
-          <AdSlotTracker placementId={slotId || "home-sidebar-native"} adKey={ADSTERRA_KEYS.nativeBanner}>
-            <AdsterraNativeBanner />
+          <AdSlotTracker placementId={slotId || "home-sidebar-native"} adKey={ADSTERRA_KEYS.nativeBannerSidebar}>
+            <AdsterraNativeBanner adKey={ADSTERRA_KEYS.nativeBannerSidebar} />
           </AdSlotTracker>
         </div>
       </div>

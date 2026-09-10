@@ -36,8 +36,8 @@ export default function ArticleNativeAd({ placement, articleId, authorId }: Arti
           <span className="text-[8px] font-semibold uppercase tracking-widest text-gray-400/80 dark:text-gray-600/80 mb-2 block text-center select-none">
             Publicidad recomendada
           </span>
-          <AdSlotTracker placementId="article-native-header" adKey={ADSTERRA_KEYS.nativeBanner} articleId={articleId} authorId={authorId}>
-            <AdsterraNativeBanner />
+          <AdSlotTracker placementId="article-native-header" adKey={ADSTERRA_KEYS.nativeBannerHeader} articleId={articleId} authorId={authorId}>
+            <AdsterraNativeBanner adKey={ADSTERRA_KEYS.nativeBannerHeader} />
           </AdSlotTracker>
         </div>
       </div>
@@ -52,8 +52,8 @@ export default function ArticleNativeAd({ placement, articleId, authorId }: Arti
             Publicidad recomendada
           </span>
           <div className="w-full flex-grow flex flex-col justify-start items-center">
-            <AdSlotTracker placementId="article-native-sidebar" adKey={ADSTERRA_KEYS.nativeBanner} articleId={articleId} authorId={authorId}>
-              <AdsterraNativeBanner />
+            <AdSlotTracker placementId="article-native-sidebar" adKey={ADSTERRA_KEYS.nativeBannerSidebar} articleId={articleId} authorId={authorId}>
+              <AdsterraNativeBanner adKey={ADSTERRA_KEYS.nativeBannerSidebar} />
             </AdSlotTracker>
           </div>
         </div>

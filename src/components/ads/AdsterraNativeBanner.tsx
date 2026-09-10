@@ -10,16 +10,17 @@ import {
 
 interface AdsterraNativeBannerProps {
   className?: string;
+  adKey?: string;
 }
 
 /**
  * Adsterra Native Banner ad component.
- * Uses the container-based approach with key 666fc12a09a07ad15eeca1a70b387d4b.
- * Appends a cache-busting timestamp to ensure the script executes on every mount/navigation.
+ * Supports configurable adKey per placement to allow independent bidding and avoid DOM container collisions.
  */
-export default function AdsterraNativeBanner({ className = "" }: AdsterraNativeBannerProps) {
+export default function AdsterraNativeBanner({ className = "", adKey }: AdsterraNativeBannerProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const activeKey = adKey || ADSTERRA_KEYS.nativeBanner;
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
@@ -32,7 +33,7 @@ export default function AdsterraNativeBanner({ className = "" }: AdsterraNativeB
 
     wrapper.innerHTML = "";
 
-    const containerId = `container-${ADSTERRA_KEYS.nativeBanner}`;
+    const containerId = `container-${activeKey}`;
     const existingContainer = document.getElementById(containerId);
     if (existingContainer && !wrapper.contains(existingContainer)) {
       return;
@@ -45,13 +46,13 @@ export default function AdsterraNativeBanner({ className = "" }: AdsterraNativeB
     const script = document.createElement("script");
     script.async = true;
     script.setAttribute("data-cfasync", "false");
-    script.src = `https://pl31171503.profitableratecpmnetwork.com/${ADSTERRA_KEYS.nativeBanner}/invoke.js`;
+    script.src = `https://pl31171503.profitableratecpmnetwork.com/${activeKey}/invoke.js`;
     wrapper.appendChild(script);
 
     return () => {
       wrapper.innerHTML = "";
     };
-  }, [pathname]);
+  }, [pathname, activeKey]);
 
   return (
     <div

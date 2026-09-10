@@ -107,6 +107,31 @@ export async function getCachedRelatedArticles(articleId: string, categoryId: st
           },
         });
 
+        // Si la categoría tiene menos de 6 historias, completar con las historias más recientes
+        if (relatedArticles.length < 6) {
+          const existingIds = [articleId, ...relatedArticles.map((a) => a.id)];
+          const backfill = await prisma.article.findMany({
+            where: {
+              status: "PUBLISHED",
+              NOT: { id: { in: existingIds } },
+            },
+            take: 6 - relatedArticles.length,
+            orderBy: { publishedAt: "desc" },
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+              excerpt: true,
+              featuredImage: true,
+              readingTime: true,
+              publishedAt: true,
+              author: { select: { name: true, username: true } },
+              category: { select: { name: true, slug: true } },
+            },
+          });
+          relatedArticles.push(...backfill);
+        }
+
         return relatedArticles.map((article) => ({
           ...article,
           featuredImage: article.featuredImage?.startsWith("data:")
