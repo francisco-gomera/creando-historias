@@ -35,6 +35,7 @@ export default function AdminRevenueReportClient({ report, periods }: AdminReven
   const currentFilter = (searchParams.get("filter") || report.filterType || "month") as RevenueFilterType;
   const [startDateInput, setStartDateInput] = useState(searchParams.get("startDate") || "");
   const [endDateInput, setEndDateInput] = useState(searchParams.get("endDate") || "");
+  const [authorViewMode, setAuthorViewMode] = useState<"full" | "simple">("full");
   const isRealRevenue = report.revenueSource === "ADSTERRA_API";
 
   const updateUrlParams = (updates: Record<string, string | null>) => {
@@ -92,37 +93,53 @@ export default function AdminRevenueReportClient({ report, periods }: AdminReven
   };
 
   const exportCSV = () => {
-    const headers = [
-      "Autor",
-      "Username",
-      "Rol",
-      "Historias Periodo",
-      "Vistas Periodo",
-      "% Autor",
-      "% Admin",
-      "Ganancia Bruta",
-      "Pago Autor ($)",
-      "Ganancia Admin ($)",
-      "Fuente",
-    ];
-    const rows = report.authors.map((a) => [
-      `"${a.name}"`,
-      `"${a.username}"`,
-      a.role,
-      a.articlesCount,
-      a.monthlyViews,
-      `${a.authorSharePct}%`,
-      `${a.platformSharePct}%`,
-      `$${a.grossRevenue.toFixed(2)}`,
-      `$${a.authorShareAmount.toFixed(2)}`,
-      `$${a.platformShareAmount.toFixed(2)}`,
-      report.revenueSource,
-    ]);
+    const isSimple = authorViewMode === "simple";
+    const headers = isSimple
+      ? ["Autor", "Username", "Rol", "Historias", "Vistas", "Pago Autor ($)", "Estado"]
+      : [
+          "Autor",
+          "Username",
+          "Rol",
+          "Historias Periodo",
+          "Vistas Periodo",
+          "% Autor",
+          "% Admin",
+          "Ganancia Bruta",
+          "Pago Autor ($)",
+          "Ganancia Admin ($)",
+          "Fuente",
+        ];
+
+    const rows = report.authors.map((a) =>
+      isSimple
+        ? [
+            `"${a.name}"`,
+            `"${a.username}"`,
+            a.role,
+            a.articlesCount,
+            a.monthlyViews,
+            `$${a.authorShareAmount.toFixed(2)}`,
+            a.status,
+          ]
+        : [
+            `"${a.name}"`,
+            `"${a.username}"`,
+            a.role,
+            a.articlesCount,
+            a.monthlyViews,
+            `${a.authorSharePct}%`,
+            `${a.platformSharePct}%`,
+            `$${a.grossRevenue.toFixed(2)}`,
+            `$${a.authorShareAmount.toFixed(2)}`,
+            `$${a.platformShareAmount.toFixed(2)}`,
+            report.revenueSource,
+          ]
+    );
 
     const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
     const link = document.createElement("a");
     link.href = encodeURI(csvContent);
-    link.download = `Reporte_Ingresos_${report.filterLabel.replace(/\s+/g, "_")}.csv`;
+    link.download = `Reporte_Ingresos_${isSimple ? "Simplificado_" : ""}${report.filterLabel.replace(/\s+/g, "_")}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -315,12 +332,41 @@ export default function AdminRevenueReportClient({ report, periods }: AdminReven
       </section>
 
       <section className="space-y-4">
-        <div className="flex items-center justify-between border-b border-gray-800 pb-3">
+        <div className="flex flex-col gap-3 border-b border-gray-800 pb-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center space-x-2">
             <FileSpreadsheet className="h-5 w-5 text-emerald-400" />
             <h2 className="font-serif text-xl font-bold text-white">Desglose de autores</h2>
           </div>
-          <span className="text-xs font-semibold text-gray-400">{report.authors.length} autores</span>
+          
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Selector de Vistas: Completa vs Simplificada */}
+            <div className="inline-flex rounded-2xl border border-gray-800 bg-gray-950 p-1">
+              <button
+                type="button"
+                onClick={() => setAuthorViewMode("full")}
+                className={`rounded-xl px-3 py-1.5 text-xs font-bold transition ${
+                  authorViewMode === "full"
+                    ? "bg-gray-800 text-white shadow-xs"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                Vista Completa
+              </button>
+              <button
+                type="button"
+                onClick={() => setAuthorViewMode("simple")}
+                className={`rounded-xl px-3 py-1.5 text-xs font-bold transition ${
+                  authorViewMode === "simple"
+                    ? "bg-emerald-600 text-white shadow-xs"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                Vista Simplificada (Solo Pagos)
+              </button>
+            </div>
+
+            <span className="text-xs font-semibold text-gray-400">{report.authors.length} autores</span>
+          </div>
         </div>
 
         <div className="overflow-hidden rounded-3xl border border-gray-800 bg-gray-900 shadow-xs">
@@ -331,10 +377,16 @@ export default function AdminRevenueReportClient({ report, periods }: AdminReven
                   <th className="p-4">Autor</th>
                   <th className="p-4 text-center">Historias</th>
                   <th className="p-4 text-center">Vistas</th>
-                  <th className="p-4 text-center">% Reparto</th>
-                  <th className="p-4 text-right">Bruto</th>
+                  {authorViewMode === "full" && (
+                    <>
+                      <th className="p-4 text-center">% Reparto</th>
+                      <th className="p-4 text-right">Bruto</th>
+                    </>
+                  )}
                   <th className="p-4 text-right">Pago autor</th>
-                  <th className="p-4 text-right">Ganancia admin</th>
+                  {authorViewMode === "full" && (
+                    <th className="p-4 text-right">Ganancia admin</th>
+                  )}
                   <th className="p-4 text-center">Estado</th>
                 </tr>
               </thead>
@@ -354,13 +406,19 @@ export default function AdminRevenueReportClient({ report, periods }: AdminReven
                     </td>
                     <td className="p-4 text-center font-semibold text-gray-200">{author.articlesCount}</td>
                     <td className="p-4 text-center font-bold text-amber-300">{author.monthlyViews.toLocaleString()}</td>
-                    <td className="p-4 text-center">
-                      <span className="font-bold text-white">{author.authorSharePct}% Autor</span>
-                      <div className="text-[10px] text-gray-400">{author.platformSharePct}% Admin</div>
-                    </td>
-                    <td className="p-4 text-right font-bold text-gray-300">${author.grossRevenue.toFixed(2)}</td>
+                    {authorViewMode === "full" && (
+                      <>
+                        <td className="p-4 text-center">
+                          <span className="font-bold text-white">{author.authorSharePct}% Autor</span>
+                          <div className="text-[10px] text-gray-400">{author.platformSharePct}% Admin</div>
+                        </td>
+                        <td className="p-4 text-right font-bold text-gray-300">${author.grossRevenue.toFixed(2)}</td>
+                      </>
+                    )}
                     <td className="p-4 text-right text-sm font-black text-emerald-400">${author.authorShareAmount.toFixed(2)}</td>
-                    <td className="p-4 text-right font-bold text-blue-400">${author.platformShareAmount.toFixed(2)}</td>
+                    {authorViewMode === "full" && (
+                      <td className="p-4 text-right font-bold text-blue-400">${author.platformShareAmount.toFixed(2)}</td>
+                    )}
                     <td className="p-4 text-center">
                       <span className="inline-flex items-center space-x-1 rounded-full border border-blue-800 bg-blue-950 px-2.5 py-1 text-[10px] font-bold text-blue-300">
                         <CheckCircle2 className="h-3 w-3 text-blue-400" />
@@ -370,6 +428,34 @@ export default function AdminRevenueReportClient({ report, periods }: AdminReven
                   </tr>
                 ))}
               </tbody>
+              <tfoot className="border-t border-gray-800 bg-gray-950/70 font-bold text-gray-300">
+                <tr>
+                  <td className="p-4 text-white">Total</td>
+                  <td className="p-4 text-center text-gray-200">
+                    {report.authors.reduce((sum, a) => sum + a.articlesCount, 0)}
+                  </td>
+                  <td className="p-4 text-center text-amber-300">
+                    {report.authors.reduce((sum, a) => sum + a.monthlyViews, 0).toLocaleString()}
+                  </td>
+                  {authorViewMode === "full" && (
+                    <>
+                      <td className="p-4 text-center text-gray-400">-</td>
+                      <td className="p-4 text-right text-gray-200">
+                        ${report.authors.reduce((sum, a) => sum + a.grossRevenue, 0).toFixed(2)}
+                      </td>
+                    </>
+                  )}
+                  <td className="p-4 text-right text-sm font-black text-emerald-400">
+                    ${report.authors.reduce((sum, a) => sum + a.authorShareAmount, 0).toFixed(2)}
+                  </td>
+                  {authorViewMode === "full" && (
+                    <td className="p-4 text-right text-blue-400">
+                      ${report.authors.reduce((sum, a) => sum + a.platformShareAmount, 0).toFixed(2)}
+                    </td>
+                  )}
+                  <td className="p-4 text-center text-gray-400">-</td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>

@@ -31,5 +31,24 @@ export default async function AuthorRevenuePage({ searchParams }: Props) {
 
   const periods = getAvailableMonthlyPeriods();
 
-  return <AuthorRevenueClient revenue={revenue} periods={periods} />;
+  const safeRevenue = {
+    authorId: revenue.authorId,
+    year: revenue.year,
+    month: revenue.month,
+    revenueSource: revenue.revenueSource,
+    rpmEstimate: revenue.rpmEstimate,
+    filterType: revenue.filterType,
+    filterLabel: revenue.filterLabel,
+    filteredViews: revenue.filteredViews,
+    authorShareAmount: revenue.authorShareAmount,
+    todayViews: revenue.todayViews,
+    todayAuthorShareAmount: revenue.todayAuthorShareAmount,
+    currentMonthViews: revenue.currentMonthViews,
+    currentMonthAuthorShareAmount: revenue.currentMonthAuthorShareAmount,
+    totalViews: revenue.totalViews,
+    totalAuthorShareAmount: revenue.totalAuthorShareAmount,
+    authorSharePercentage: revenue.authorSharePercentage,
+  };
+
+  return <AuthorRevenueClient revenue={safeRevenue} periods={periods} />;
 }

@@ -27,7 +27,6 @@ async function main() {
   });
 
   const passwordHashAdmin = await bcrypt.hash("admin123", 12);
-  const passwordHashAuthor = await bcrypt.hash("autor123", 12);
 
   // Admin User
   const admin = await prisma.user.create({
@@ -39,43 +38,6 @@ async function main() {
       role: "ADMIN",
       avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400",
       bio: "Administrador general y editor jefe de Creando-Historias.",
-    },
-  });
-
-  // Authors
-  const author1 = await prisma.user.create({
-    data: {
-      email: "autor1@example.com",
-      username: "carlos_tech",
-      name: "Carlos Mendoza",
-      passwordHash: passwordHashAuthor,
-      role: "AUTHOR",
-      avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
-      bio: "Especialista en Inteligencia Artificial, software y desarrollo web moderno.",
-    },
-  });
-
-  const author2 = await prisma.user.create({
-    data: {
-      email: "autor2@example.com",
-      username: "elena_finanzas",
-      name: "Elena Rostova",
-      passwordHash: passwordHashAuthor,
-      role: "AUTHOR",
-      avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
-      bio: "Analista de mercados globales, finanzas digitales y negocios sostenibles.",
-    },
-  });
-
-  const author3 = await prisma.user.create({
-    data: {
-      email: "autor3@example.com",
-      username: "david_estilo",
-      name: "David Silva",
-      passwordHash: passwordHashAuthor,
-      role: "AUTHOR",
-      avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400",
-      bio: "Periodista enfocado en productividad, cultura, tecnología y estilo de vida.",
     },
   });
 
@@ -95,7 +57,7 @@ async function main() {
   const tagWeb = await prisma.tag.create({ data: { name: "Web", slug: "web" } });
   const tagStartup = await prisma.tag.create({ data: { name: "Startups", slug: "startups" } });
 
-  // Articles for Author 1 (Carlos Mendoza)
+  // Articles
   const art1 = await prisma.article.create({
     data: {
       title: "El Futuro del Desarrollo Web con Next.js y Server Components",
@@ -107,7 +69,7 @@ async function main() {
       categoryId: catTech.id,
       readingTime: 5,
       viewCount: 1450,
-      authorId: author1.id,
+      authorId: admin.id,
       publishedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
     },
   });
@@ -123,12 +85,11 @@ async function main() {
       categoryId: catTech.id,
       readingTime: 4,
       viewCount: 920,
-      authorId: author1.id,
+      authorId: admin.id,
       publishedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
     },
   });
 
-  // Articles for Author 2 (Elena Rostova)
   const art2 = await prisma.article.create({
     data: {
       title: "Cómo Estructurar un Modelo de Ingresos Recurrentes en 2026",
@@ -140,7 +101,7 @@ async function main() {
       categoryId: catBiz.id,
       readingTime: 4,
       viewCount: 890,
-      authorId: author2.id,
+      authorId: admin.id,
       publishedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
     },
   });
@@ -156,7 +117,7 @@ async function main() {
       categoryId: catBiz.id,
       readingTime: 6,
       viewCount: 640,
-      authorId: author2.id,
+      authorId: admin.id,
       publishedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
     },
   });
@@ -209,7 +170,7 @@ async function main() {
   for (let i = 0; i < 50; i++) {
     viewsData.push({
       articleId: art1.id,
-      authorId: author1.id,
+      authorId: admin.id,
       country: "ES",
       deviceType: "desktop",
       anonymousSessionHash: `hash-${i}`,
@@ -219,7 +180,7 @@ async function main() {
   for (let i = 0; i < 30; i++) {
     viewsData.push({
       articleId: art2.id,
-      authorId: author2.id,
+      authorId: admin.id,
       country: "MX",
       deviceType: "mobile",
       anonymousSessionHash: `hash-m-${i}`,

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Calendar, Clock, DollarSign, Eye, Filter, Info, MousePointerClick, Percent, RadioTower, Sparkles } from "lucide-react";
+import { Calendar, Clock, DollarSign, Eye, Filter, Info, Percent, RadioTower, Sparkles } from "lucide-react";
 import { RevenueFilterType } from "@/services/revenue.service";
 
 interface AuthorRevenueClientProps {
@@ -71,11 +71,11 @@ export default function AuthorRevenueClient({ revenue, periods }: AuthorRevenueC
       <div className="flex items-start space-x-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-300">
         <Info className="mt-0.5 h-5 w-5 flex-shrink-0" />
         <span>
-          <strong>Nota de monetizacion:</strong>{" "}
+          <strong>Nota de monetización:</strong>{" "}
           {isRealRevenue
-            ? "Los montos usan el revenue real de Adsterra y se atribuyen a autores segun las lecturas registradas dentro de la plataforma."
-            : `Los montos son estimados con RPM de $${revenue.rpmEstimate.toFixed(2)} porque la API de Adsterra aun no esta configurada o no respondio.`}{" "}
-          Reparto: {revenue.authorSharePercentage}% autor / {revenue.platformSharePercentage}% plataforma.
+            ? "Los montos reflejan tus ingresos atribuidos a partir de los datos reales de Adsterra según las lecturas de tus artículos."
+            : `Los montos son estimados con un RPM base de $${revenue.rpmEstimate.toFixed(2)} según las lecturas de tus artículos.`}{" "}
+          Tu porcentaje asignado: {revenue.authorSharePercentage}%.
         </span>
       </div>
 
@@ -135,20 +135,52 @@ export default function AuthorRevenueClient({ revenue, periods }: AuthorRevenueC
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-6">
-        <MetricCard title="Tus ingresos hoy" value={`$${revenue.todayAuthorShareAmount.toFixed(2)}`} detail={`${revenue.todayViews.toLocaleString()} lecturas hoy`} icon={<Clock className="h-4 w-4 text-emerald-600" />} color="text-emerald-600 dark:text-emerald-400" />
-        <MetricCard title="Mes en curso" value={`$${revenue.currentMonthAuthorShareAmount.toFixed(2)}`} detail={`${revenue.currentMonthViews.toLocaleString()} vistas`} icon={<Sparkles className="h-4 w-4 text-blue-600" />} color="text-blue-600 dark:text-blue-400" />
-        <MetricCard title={revenue.filterLabel} value={`$${revenue.authorShareAmount.toFixed(2)}`} detail={`${revenue.filteredViews.toLocaleString()} vistas atribuidas`} icon={<DollarSign className="h-4 w-4 text-purple-600" />} color="text-purple-600 dark:text-purple-400" />
-        <MetricCard title="Total historico" value={`$${revenue.totalAuthorShareAmount.toFixed(2)}`} detail={`${revenue.totalViews.toLocaleString()} lecturas`} icon={<Eye className="h-4 w-4 text-amber-500" />} color="text-gray-900 dark:text-white" />
-        <MetricCard title="Clicks / CTR sitio" value={revenue.totalClicks.toLocaleString()} detail={`CTR global: ${revenue.ctr.toFixed(2)}%`} icon={<MousePointerClick className="h-4 w-4 text-pink-600" />} color="text-pink-600 dark:text-pink-400" />
-        <MetricCard title="CPM / Impresiones" value={`$${revenue.cpm.toFixed(2)}`} detail={`${revenue.totalImpressions.toLocaleString()} impresiones`} icon={<Percent className="h-4 w-4 text-cyan-600" />} color="text-cyan-600 dark:text-cyan-400" />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <MetricCard
+          title={revenue.filterLabel}
+          value={`$${revenue.authorShareAmount.toFixed(2)}`}
+          detail={`${revenue.filteredViews.toLocaleString()} lecturas atribuidas`}
+          icon={<DollarSign className="h-4 w-4 text-purple-600" />}
+          color="text-purple-600 dark:text-purple-400"
+        />
+        {currentFilter === "today" ? (
+          <MetricCard
+            title="Mes en curso"
+            value={`$${revenue.currentMonthAuthorShareAmount.toFixed(2)}`}
+            detail={`${revenue.currentMonthViews.toLocaleString()} vistas`}
+            icon={<Sparkles className="h-4 w-4 text-blue-600" />}
+            color="text-blue-600 dark:text-blue-400"
+          />
+        ) : (
+          <MetricCard
+            title="Tus ingresos hoy"
+            value={`$${revenue.todayAuthorShareAmount.toFixed(2)}`}
+            detail={`${revenue.todayViews.toLocaleString()} lecturas hoy`}
+            icon={<Clock className="h-4 w-4 text-emerald-600" />}
+            color="text-emerald-600 dark:text-emerald-400"
+          />
+        )}
+        <MetricCard
+          title="Total histórico"
+          value={`$${revenue.totalAuthorShareAmount.toFixed(2)}`}
+          detail={`${revenue.totalViews.toLocaleString()} lecturas acumuladas`}
+          icon={<Eye className="h-4 w-4 text-amber-500" />}
+          color="text-gray-900 dark:text-white"
+        />
+        <MetricCard
+          title="Tu reparto asignado"
+          value={`${revenue.authorSharePercentage}%`}
+          detail="De los ingresos por tus lecturas"
+          icon={<Percent className="h-4 w-4 text-blue-600" />}
+          color="text-blue-600 dark:text-blue-400"
+        />
       </div>
 
       {isRealRevenue && (
         <div className="flex items-start space-x-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-800 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-300">
           <RadioTower className="mt-0.5 h-5 w-5 flex-shrink-0" />
           <span>
-            Adsterra reporto ${revenue.grossEstimatedRevenue.toFixed(2)} para este periodo. Tu monto se calcula por participacion de lecturas dentro del sitio.
+            Tus ingresos se calculan a partir de los ingresos verificados con Adsterra según tu participación de lecturas dentro del sitio.
           </span>
         </div>
       )}

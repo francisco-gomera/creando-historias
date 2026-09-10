@@ -1,0 +1,295 @@
+<!-- ========================================================
+     CREANDO-HISTORIAS - PÁGINA: SOBRE NOSOTROS
+     Instrucciones: En Blogger ve a Páginas > Sobre Nosotros (o Editar).
+     Cambia a "Vista en HTML" y pega todo este código.
+     Título de la página en Blogger: Sobre Nosotros
+======================================================== -->
+<div class="ch-about-container">
+  <style>
+    .ch-about-container {
+      font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+      color: #334155;
+      line-height: 1.75;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 10px 15px 50px 15px;
+      box-sizing: border-box;
+    }
+    .ch-about-container * {
+      box-sizing: border-box;
+    }
+    .ch-hero {
+      text-align: center;
+      padding: 25px 20px 35px 20px;
+    }
+    .ch-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%);
+      color: #4f46e5;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 50px;
+      margin-bottom: 16px;
+      border: 1px solid #c7d2fe;
+    }
+    .ch-title {
+      font-size: 34px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 16px 0;
+      line-height: 1.25;
+    }
+    .ch-title span {
+      background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .ch-subtitle {
+      font-size: 17px;
+      color: #475569;
+      max-width: 680px;
+      margin: 0 auto;
+      line-height: 1.65;
+    }
+    .ch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 22px;
+      margin: 35px 0;
+    }
+    .ch-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 26px 22px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      text-align: left;
+    }
+    .ch-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(79, 70, 229, 0.08);
+    }
+    .ch-card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 16px;
+      border: 1px solid #e2e8f0;
+    }
+    .ch-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0 0 8px 0;
+    }
+    .ch-card p {
+      font-size: 14px;
+      color: #64748b;
+      margin: 0;
+      line-height: 1.6;
+    }
+    .ch-section-box {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 32px 30px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+    }
+    .ch-section-box h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 14px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .ch-section-box p {
+      font-size: 15px;
+      line-height: 1.75;
+      color: #475569;
+      margin: 0 0 14px 0;
+    }
+    .ch-section-box p:last-child {
+      margin-bottom: 0;
+    }
+    .ch-highlight-banner {
+      background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+      color: #ffffff;
+      border-radius: 22px;
+      padding: 36px 32px;
+      margin: 35px 0;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+    }
+    .ch-highlight-banner h2 {
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: 800;
+      margin: 0 0 14px 0;
+    }
+    .ch-highlight-banner p {
+      color: #cbd5e1;
+      font-size: 15px;
+      line-height: 1.7;
+      margin: 0 0 12px 0;
+    }
+    .ch-highlight-banner p:last-child {
+      margin-bottom: 0;
+    }
+    .ch-correction-alert {
+      background: #f8fafc;
+      border-left: 4px solid #4f46e5;
+      padding: 20px 24px;
+      border-radius: 0 14px 14px 0;
+      margin: 28px 0;
+      border-top: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .ch-correction-alert h4 {
+      margin: 0 0 6px 0;
+      color: #0f172a;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .ch-correction-alert p {
+      margin: 0;
+      font-size: 14.5px;
+      color: #475569;
+    }
+    .ch-correction-alert a {
+      color: #4f46e5;
+      font-weight: 700;
+      text-decoration: underline;
+    }
+    .ch-cta-wrap {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 25px;
+      border-top: 1px solid #e2e8f0;
+    }
+    .ch-btn-contact {
+      display: inline-block;
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+      color: #ffffff !important;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 13px 32px;
+      border-radius: 50px;
+      text-decoration: none !important;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+      transition: all 0.25s ease;
+    }
+    .ch-btn-contact:hover {
+      background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45);
+      color: #ffffff !important;
+    }
+    @media (max-width: 600px) {
+      .ch-title { font-size: 27px; }
+      .ch-subtitle { font-size: 15px; }
+      .ch-section-box { padding: 22px 18px; }
+      .ch-highlight-banner { padding: 26px 20px; }
+    }
+  </style>
+
+  <!-- Hero Editorial -->
+  <div class="ch-hero">
+    <div class="ch-badge">📖 Identidad Editorial &amp; Propósito</div>
+    <h1 class="ch-title">Sobre <span>Creando-Historias</span></h1>
+    <p class="ch-subtitle">
+      Una publicación digital dedicada a relatos originales, ficción contemporánea y contenidos de entretenimiento orientados a enriquecer tu experiencia de lectura.
+    </p>
+  </div>
+
+  <!-- Quiénes somos -->
+  <div class="ch-section-box">
+    <h2><span>👥</span> Quiénes Somos</h2>
+    <p>
+      <strong>Creando-Historias</strong> es una publicación digital e independiente fundada y dirigida por su autor y editor, <strong>Mr. Nexo</strong>. Nacimos con la vocación de crear un espacio donde la narrativa, las vivencias dramatizadas y los giros inesperados vuelvan a ser el centro de atención.
+    </p>
+    <p>
+      En un panorama saturado de contenido superficial y efímero, creemos firmemente en el poder de una buena historia para atrapar la imaginación, conectar emociones y ofrecer momentos de entretenimiento de calidad.
+    </p>
+  </div>
+
+  <!-- Qué publicamos -->
+  <div class="ch-grid">
+    <div class="ch-card">
+      <div class="ch-card-icon">🎭</div>
+      <h3>Relatos de Ficción</h3>
+      <p>Obras narrativas originales que exploran relaciones humanas, secretos familiares, lecciones de vida y dilemas morales cotidianos.</p>
+    </div>
+
+    <div class="ch-card">
+      <div class="ch-card-icon">✨</div>
+      <h3>Entretenimiento</h3>
+      <p>Artículos amenos, curiosidades y reflexiones sobre historias populares, cultura y entretenimiento contemporáneo.</p>
+    </div>
+
+    <div class="ch-card">
+      <div class="ch-card-icon">🔍</div>
+      <h3>Lectura Reflexiva</h3>
+      <p>Textos diseñados para provocar conversación, introspección personal y el disfrute pausado de una narrativa bien construida.</p>
+    </div>
+  </div>
+
+  <!-- Cómo trabajamos -->
+  <div class="ch-section-box">
+    <h2><span>✍️</span> Cómo Trabajamos y Nuestro Proceso</h2>
+    <p>
+      Cada obra publicada en Creando-Historias pasa por un cuidadoso proceso de revisión editorial previo a su lanzamiento:
+    </p>
+    <p>
+      Los contenidos son revisados antes de su publicación con el objetivo de mejorar la claridad, coherencia narrativa, presentación visual, corrección ortográfica y calidad editorial global. Nos aseguramos de que cada relato mantenga un ritmo envolvente y respete el tiempo de nuestros lectores.
+    </p>
+  </div>
+
+  <!-- Relatos de Ficción (Aviso de transparencia) -->
+  <div class="ch-highlight-banner">
+    <h2>🎭 Transparencia sobre los Relatos de Ficción</h2>
+    <p>
+      Creando-Historias publica relatos y obras narrativas creadas principalmente con fines de entretenimiento. Salvo que se indique expresamente lo contrario, los personajes, nombres, diálogos, situaciones y acontecimientos descritos en nuestros relatos pueden ser ficticios, estar dramatizados o haber sido modificados con fines narrativos.
+    </p>
+    <p>
+      Cualquier parecido con personas vivas o fallecidas, o con hechos acontecidos en la realidad, es puramente coincidente. Cada historia etiquetada como ficción incluye un distintivo editorial visible para garantizar la máxima transparencia.
+    </p>
+  </div>
+
+  <!-- Compromiso Editorial -->
+  <div class="ch-section-box">
+    <h2><span>🛡️</span> Nuestro Compromiso Editorial</h2>
+    <p>
+      Nos comprometemos a mantener una publicación accesible, sin publicidad engañosa ni mecanismos intrusivos que entorpezcan la lectura. Nuestro objetivo es que encuentres en Creando-Historias una revista digital confiable, limpia y estimulante.
+    </p>
+  </div>
+
+  <!-- Correcciones -->
+  <div class="ch-correction-alert">
+    <h4>¿Has encontrado un error o tienes una sugerencia?</h4>
+    <p>
+      Valoramos enormemente la atención de nuestros lectores. Si detectas alguna errata, inconsistencia o deseas plantear una sugerencia editorial, <a href="/p/contacto.html">contacta con nosotros</a>. Revisamos cada mensaje con atención.
+    </p>
+  </div>
+
+  <!-- CTA Contacto -->
+  <div class="ch-cta-wrap">
+    <p style="font-size: 14.5px; color: #64748b; margin-bottom: 16px;">
+      ¿Quieres ponerte en contacto con el equipo o proponer una colaboración?
+    </p>
+    <a href="/p/contacto.html" class="ch-btn-contact">
+      Enviar Mensaje a Contacto &rarr;
+    </a>
+  </div>
+</div>

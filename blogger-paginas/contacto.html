@@ -1,0 +1,401 @@
+<!-- ========================================================
+     CREANDO-HISTORIAS - PÁGINA: CONTACTO
+     Instrucciones: En Blogger ve a Páginas > Contacto (o Editar).
+     Cambia a "Vista en HTML" y pega todo este código.
+     Título de la página en Blogger: Contacto
+======================================================== -->
+<div class="ch-contact-container">
+  <style>
+    .ch-contact-container {
+      font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+      color: #334155;
+      line-height: 1.7;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 10px 15px 50px 15px;
+      box-sizing: border-box;
+    }
+    .ch-contact-container * {
+      box-sizing: border-box;
+    }
+    .ch-hero {
+      text-align: center;
+      padding: 25px 20px 30px 20px;
+    }
+    .ch-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%);
+      color: #4f46e5;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 50px;
+      margin-bottom: 16px;
+      border: 1px solid #c7d2fe;
+    }
+    .ch-title {
+      font-size: 34px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 16px 0;
+      line-height: 1.25;
+    }
+    .ch-title span {
+      background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .ch-subtitle {
+      font-size: 17px;
+      color: #475569;
+      max-width: 680px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .ch-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin-top: 30px;
+    }
+    .ch-info-card {
+      background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+      color: #ffffff;
+      border-radius: 20px;
+      padding: 32px 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 10px 25px rgba(30, 27, 75, 0.2);
+    }
+    .ch-info-card h3 {
+      font-size: 22px;
+      font-weight: 800;
+      margin: 0 0 12px 0;
+      color: #ffffff;
+    }
+    .ch-info-card p {
+      color: #cbd5e1;
+      font-size: 14px;
+      margin: 0 0 20px 0;
+      line-height: 1.6;
+    }
+    .ch-email-box {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
+      padding: 16px;
+      margin: 18px 0;
+      backdrop-filter: blur(10px);
+    }
+    .ch-email-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #a5b4fc;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .ch-email-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      word-break: break-all;
+    }
+    .ch-email-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .ch-btn-mini {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .ch-btn-mini:hover {
+      background: rgba(255, 255, 255, 0.28);
+    }
+    .ch-response-time {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+    .ch-form-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 30px 26px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    }
+    .ch-form-card h3 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 16px 0;
+    }
+    .ch-form-group {
+      margin-bottom: 14px;
+    }
+    .ch-form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+    .ch-form-group input,
+    .ch-form-group select,
+    .ch-form-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 14px;
+      color: #1e293b;
+      background: #f8fafc;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .ch-form-group input:focus,
+    .ch-form-group select:focus,
+    .ch-form-group textarea:focus {
+      outline: none;
+      border-color: #4f46e5;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+    .ch-btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .ch-btn-submit:hover {
+      background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(79, 70, 229, 0.35);
+    }
+    .ch-form-privacy-note {
+      font-size: 12px;
+      line-height: 1.5;
+      color: #64748b;
+      margin-top: 14px;
+      text-align: center;
+    }
+    .ch-form-privacy-note a {
+      color: #4f46e5;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+    .ch-faq-section {
+      margin-top: 45px;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 35px;
+    }
+    .ch-faq-section h3 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+      text-align: center;
+      margin: 0 0 24px 0;
+    }
+    .ch-faq-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+    }
+    .ch-faq-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 18px 20px;
+    }
+    .ch-faq-item h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0 0 6px 0;
+    }
+    .ch-faq-item p {
+      font-size: 13.5px;
+      color: #64748b;
+      margin: 0;
+      line-height: 1.5;
+    }
+    @media (max-width: 768px) {
+      .ch-columns {
+        grid-template-columns: 1fr;
+      }
+      .ch-title { font-size: 26px; }
+      .ch-subtitle { font-size: 15px; }
+    }
+  </style>
+
+  <!-- Hero -->
+  <div class="ch-hero">
+    <div class="ch-badge">💬 Atención &amp; Comunidad</div>
+    <h1 class="ch-title">Ponte en <span>Contacto</span></h1>
+    <p class="ch-subtitle">
+      ¿Tienes sugerencias, correcciones editoriales, dudas sobre privacidad o propuestas? Escríbenos directamente y te responderemos a la brevedad.
+    </p>
+  </div>
+
+  <div class="ch-columns">
+    <!-- Tarjeta Informativa -->
+    <div class="ch-info-card">
+      <div>
+        <h3>Creando-Historias</h3>
+        <p>
+          Atendemos personalmente a nuestros lectores y colaboradores. Tu retroalimentación es clave para elevar la calidad editorial de cada historia.
+        </p>
+
+        <div class="ch-email-box">
+          <div class="ch-email-label">Correo Electrónico Oficial</div>
+          <div class="ch-email-text" id="ch-email-val">soporte@creando-historias.com</div>
+          <div class="ch-email-actions">
+            <button type="button" class="ch-btn-mini" onclick="chCopyEmail()">
+              📋 <span id="ch-copy-btn-text">Copiar Correo</span>
+            </button>
+            <a href="mailto:soporte@creando-historias.com" class="ch-btn-mini">
+              ✉️ Abrir en mi App
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="ch-response-time">
+        <span style="font-size: 20px;">⏱️</span>
+        <span><strong>Respuesta estimada:</strong> Menos de 24 a 48 horas en días laborables.</span>
+      </div>
+    </div>
+
+    <!-- Formulario Directo -->
+    <div class="ch-form-card">
+      <h3>Envíanos un Mensaje</h3>
+      <form id="ch-contact-form" onsubmit="chHandleSubmit(event)">
+        <div class="ch-form-group">
+          <label for="ch-name">Tu Nombre *</label>
+          <input type="text" id="ch-name" placeholder="Ej. Juan Pérez" required="required" />
+        </div>
+
+        <div class="ch-form-group">
+          <label for="ch-user-email">Tu Correo Electrónico *</label>
+          <input type="email" id="ch-user-email" placeholder="ejemplo@correo.com" required="required" />
+        </div>
+
+        <!-- Selector de Motivo de Contacto (Tarea 9) -->
+        <div class="ch-form-group">
+          <label for="ch-subject-select">Motivo de Consulta *</label>
+          <select id="ch-subject-select" required="required">
+            <option value="Correcciones editoriales">Correcciones editoriales</option>
+            <option value="Derechos de autor">Derechos de autor</option>
+            <option value="Problemas técnicos">Problemas técnicos</option>
+            <option value="Colaboraciones">Colaboraciones</option>
+            <option value="Privacidad">Privacidad</option>
+            <option value="Publicidad">Publicidad</option>
+            <option value="Otros">Otros</option>
+          </select>
+        </div>
+
+        <div class="ch-form-group">
+          <label for="ch-msg">Mensaje *</label>
+          <textarea id="ch-msg" rows="4" placeholder="Escribe aquí tu mensaje detallado..." required="required"></textarea>
+        </div>
+
+        <button type="submit" class="ch-btn-submit">
+          <span>Enviar Mensaje</span> &rarr;
+        </button>
+
+        <!-- Cláusula de Privacidad Exigida (Tarea 9) -->
+        <p class="ch-form-privacy-note">
+          Al enviar este formulario, utilizaremos los datos proporcionados únicamente para gestionar y responder tu consulta. Consulta nuestra <a href="/p/politica-de-privacidad.html">Política de Privacidad</a>.
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Preguntas Frecuentes / FAQ -->
+  <div class="ch-faq-section">
+    <h3>Preguntas Frecuentes</h3>
+    <div class="ch-faq-grid">
+      <div class="ch-faq-item">
+        <h4>📝 ¿Puedo sugerir un tema o relato?</h4>
+        <p>¡Sí, por supuesto! Valoramos enormemente las ideas y propuestas sobre temas que te gustaría ver tratados en la revista.</p>
+      </div>
+
+      <div class="ch-faq-item">
+        <h4>🤝 ¿Aceptan colaboraciones editoriales?</h4>
+        <p>Si eres autor, editor o divulgador y te apasiona la ficción, selecciona "Colaboraciones" y envíanos tu propuesta.</p>
+      </div>
+
+      <div class="ch-faq-item">
+        <h4>⚠️ ¿Problemas técnicos o erratas?</h4>
+        <p>Si detectas algún enlace roto, error de texto o falla técnica, indícanos la página para que podamos revisarlo y corregirlo con prontitud.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script interactivo integrado para Blogger -->
+  <script>
+    function chCopyEmail() {
+      var email = "soporte@creando-historias.com";
+      var btnText = document.getElementById("ch-copy-btn-text");
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(email).then(function() {
+          btnText.textContent = "¡Copiado con Éxito!";
+          setTimeout(function() { btnText.textContent = "Copiar Correo"; }, 2500);
+        });
+      } else {
+        var tempInput = document.createElement("input");
+        tempInput.value = email;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        btnText.textContent = "¡Copiado con Éxito!";
+        setTimeout(function() { btnText.textContent = "Copiar Correo"; }, 2500);
+      }
+    }
+
+    function chHandleSubmit(e) {
+      e.preventDefault();
+      var name = document.getElementById("ch-name").value;
+      var email = document.getElementById("ch-user-email").value;
+      var subjectSelect = document.getElementById("ch-subject-select").value;
+      var message = document.getElementById("ch-msg").value;
+
+      var fullSubject = "[Creando-Historias] " + subjectSelect + " - " + name;
+      var body = "Motivo: " + subjectSelect + "\nNombre: " + name + "\nCorreo: " + email + "\n\nMensaje:\n" + message;
+      var mailtoUrl = "mailto:soporte@creando-historias.com?subject=" + encodeURIComponent(fullSubject) + "&body=" + encodeURIComponent(body);
+      
+      window.location.href = mailtoUrl;
+    }
+  </script>
+</div>
